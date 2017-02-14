@@ -69,27 +69,19 @@ $(document).ready(function() {
 
 	socket.on('message', function(msg) {
 		chatcontent.prepend('<p><span style="color:' + msg.color + '">' + msg.nick + '</span>: ' + msg.text + '</p>');
-		chatScrollDown();
 	});
 
 	socket.on('userJoined', function (user) {
-		chatcontent.prepend('<p>&raquo; <span style="color:' + user.color + '">' + user.nick + '</span> joined. You can change your name by replacing \'guest\' in the box above.</p>');
-		chatScrollDown();
+		chatcontent.prepend('<p>&raquo; <span style="color:' + user.color + '">' + user.nick + '</span> joined. You can change your name by replacing \'guest\' in the Message box.</p>');
 	});
 
 	socket.on('userLeft', function (user) {
 		chatcontent.prepend('<p>&raquo; <span style="color:' + user.color + '">' + user.nick + '</span> left.</p>');
-		chatScrollDown();
 	});
 
 	socket.on('nickChange', function (user) {
 		chatcontent.prepend('<p><span style="color:' + user.color + '">' + user.oldNick + '</span> changed his name to <span style="color:' + user.color + '">' + user.newNick + '</span></p>');
-		chatScrollDown();
 	});
-
-	function chatScrollDown() {
-		chatcontent.scrollTop(chatcontent[0].scrollHeight);
-	};
 
 	// ================================================
 	//                           canvas drawing section
@@ -255,7 +247,6 @@ $(document).ready(function() {
 		}
 
 		chatcontent.prepend('<p>&raquo; <span style="color:' + msg.color + '">' + msg.nick + '</span> is drawing!</p>');
-		chatScrollDown();
 	});
 
 	socket.on('youCanDraw', function(msg) {
@@ -265,18 +256,15 @@ $(document).ready(function() {
 			status.text(room);
 		}
 		chatcontent.prepend('<p>Press <strong>DRAW</strong> to start drawing!</p>');
-		chatScrollDown();
 	});
 
 	socket.on('wordGuessed', function(msg) {
 		chatcontent.prepend('<p>&raquo; <span style="color:' + msg.color + '">' + msg.nick + '</span> guessed the word (<strong>' + msg.text + '</strong>) !!!</p>');
-		chatScrollDown();
 		resetTimer();
 	});
 
 	socket.on('wordNotGuessed', function(msg) {
 		chatcontent.prepend('<p>&raquo; The turn is over! The word was <strong>' + msg.text + '</strong>.</p>');
-		chatScrollDown();
 		resetTimer();
 	});
 
