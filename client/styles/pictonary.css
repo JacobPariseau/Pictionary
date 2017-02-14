@@ -64,9 +64,9 @@ input[type="button"] {
 	font-weight: 500;
 	font-family: 'Roboto', sans-serif;
 	font-size: 1rem;
-	opacity: 0.8;
 	cursor: pointer;
 	transition: background 0.4s;
+	color: white;
 }
 
 button:hover,
@@ -161,17 +161,18 @@ span.ink {
 	background: #fff;
 	overflow: auto;
 	overflow-x: hidden;
-	padding-top:5px;
-	padding-left:10px;
-	padding-bottom:5px;
+	padding: 0.5rem 1rem;
 }
 
 #chatcontent p
 {
-	padding:0px;
-	margin-top:2px;
+	margin-top:4px;
 	margin-bottom:0;
 	opacity: 0.6;
+	padding: 0.25rem;
+    border-radius: 0.25rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.26);
+
 }
 
 #chatcontent p:first-child {
@@ -219,12 +220,29 @@ span.ink {
   background: #252525 !important;
 	display:inline-block;
 	box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
-	transform: translateY(-40%);
-	-webkit-transform: translateY(-40%);
+	transform: translateY(-1rem);
+	-webkit-transform: translateY(-1rem);
+}
+.spacer {
+	width: 4rem;
+	background: white;
+	border-radius: 0 0 2rem 2rem;
+	margin: 0 -2rem;
+	z-index: 2;
+	transform: translateY(-0.5rem);
 }
 
 .action-bar .box {
 	flex: 1;
 	-ms-flex: 1;
 	-webkit-flex: 1;
+}
+
+#invite {
+	background: #f44336;
+    box-shadow: 0 -3px 5px 0 rgba(230,81,0,0.25);
+}
+#readytodraw {
+	background: #42a5f5;
+	box-shadow: 0 -3px 5px 0 rgba(63,81,181,0.25);
 }
