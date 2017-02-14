@@ -131,7 +131,7 @@ $(document).ready(function() {
 			painting = true;
 			const x = e.pageX || e.targetTouches[0].pageX;
 			const y = e.pageY || e.targetTouches[0].pageY;
-			var newpoint = { x: (x - this.offsetLeft) / this.width * this.offsetWidth, y: (y - this.offsetTop) / this.height * this.offsetHeight},
+			var newpoint = { x: (x - this.offsetLeft) / this.offsetWidth * this.width, y: (y - this.offsetTop) / this.offsetHeight * this.height},
 				line = { from: null, to: newpoint, color: selectedcolor };
 
 			draw(line);
@@ -144,7 +144,7 @@ $(document).ready(function() {
 		if(myturn && painting) {
 			const x = e.pageX || e.targetTouches[0].pageX;
 			const y = e.pageY || e.targetTouches[0].pageY;
-			var newpoint = { x: (x - this.offsetLeft) / this.width * this.offsetWidth, y: (y - this.offsetTop) / this.height * this.offsetHeight},
+			var newpoint = { x: (x - this.offsetLeft) / this.offsetWidth * this.width, y: (y - this.offsetTop) / this.offsetHeight * this.height},
 				line = { from: lastpoint, to: newpoint, color: selectedcolor };
 
 			draw(line);
