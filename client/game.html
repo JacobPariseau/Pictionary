@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<title>Dr. Ink</title>
+		<link rel="stylesheet" type="text/css" href="styles/pictonary.css" />
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.min.js"></script>
+		<script type="text/javascript" src="scripts/jquery-1.7.2.min.js"></script>
+		<script type="text/javascript" src="scripts/pictonary-client.js"></script>
+		<script type="text/javascript" src="scripts/jscolor/jscolor.js"></script>
+	</head>
+	<body>
+		<div id="main">
+			<header>
+				<span id="status">Welcome :)</span>
+				<input type="button" id="readytodraw" value="DRAW" />
+			</header>
+			<section class="top">
+				<div id="gamepanel">
+					<canvas id="canvas" width="300" height="300"></canvas>
+				</div>
+			</section>
+			<section class="bottom">
+				<div id="chatpanel">
+					<input type="text" id="chatnick" disabled="disabled" value="guest" maxlength="32" />
+					<input type="text" id="chatinput" disabled="disabled" maxlength="256" /><br/>
+					<div id="chatcontent"></div>
+				</div>
+			</section>
+		</div>
+	</body>
+</html>

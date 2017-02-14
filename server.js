@@ -13,12 +13,15 @@ console.log('>>> Pictionary started at port ' + port + ' >>>');
 
 function handler (req, res) {
 	var reqFile = req.url;
-	
+	console.log(reqFile);
 	// default file
 	if (reqFile == '/') {
 		reqFile = '/index.html';
 	}
-	
+	else if (reqFile.split('/').length == 2) {
+		reqFile = '/game.html';
+	}
+
 	// file exists?
 	try {
 		fs.lstatSync(__dirname + '/client' + reqFile);
@@ -26,7 +29,7 @@ function handler (req, res) {
 	catch (e) {
 		reqFile = '/404.html';
 	}
-	
+
 	// show file
 	fs.readFile(__dirname + '/client' + reqFile,
 		function (err, data) {
@@ -34,7 +37,7 @@ function handler (req, res) {
 				res.writeHead(200);
 				return res.end('Error loading requested file ' + reqFile);
 			}
-			
+
 			var filetype = reqFile.substr(reqFile.lastIndexOf('.'));
 			switch(filetype) {
 				case '.html':
@@ -53,7 +56,7 @@ function handler (req, res) {
 					res.setHeader('Content-Type', 'image/png');
 					break;
 			}
-			
+
 			res.writeHead(200);
 			res.end(data);
 		}
@@ -76,26 +79,26 @@ io.sockets.on('connection', function (socket) {
 	var myNick = 'guest',
 		myColor = rndColor();
 		myScore = 0;
-	
+
 	users.push({ id: socket.id, nick: myNick, color: myColor, score: myScore });
 	io.sockets.emit('userJoined', { nick: myNick, color: myColor });
 	io.sockets.emit('users', users);
 	socket.emit('drawCanvas', canvas);
-	
+
 	// notify if someone is drawing
 	if(currentPlayer) {
 		for(var i = 0; i<users.length; i++) {
 			if(users[i].id == currentPlayer) {
-				socket.emit('firendDraw', { color: users[i].color, nick: users[i].nick });
+				socket.emit('friendDraw', { color: users[i].color, nick: users[i].nick });
 				break;
 			}
 		}
 	}
-	
+
 	// =============
 	// chat logic section
 	// =============
-	
+
 	socket.on('message', function (msg) {
 		var sanitizedMsg = sanitizer.sanitize(msg.text);
 		if(sanitizedMsg != msg.text) {
@@ -104,36 +107,36 @@ io.sockets.on('connection', function (socket) {
 		if(!sanitizedMsg || sanitizedMsg.length>256) {
 			return;
 		}
-		
+
 		io.sockets.emit('message', { text: sanitizedMsg, color: myColor, nick: myNick });
-		
+
 		// check if current word was guessed
 		if(currentPlayer != null && currentPlayer != socket.id) {
 			if(sanitizedMsg.toLowerCase().trim() == currentWord) {
 				io.sockets.emit('wordGuessed', { text: currentWord, color: myColor, nick: myNick });
-				
+
 				// add scores to guesser and drawer
 				for(var i = 0; i<users.length; i++) {
 					if(users[i].id == socket.id || users[i].id == currentPlayer) {
 						users[i].score = users[i].score + 10;
 					}
 				}
-				
+
 				// comunicate new scores
 				sortUsersByScore();
 				io.sockets.emit('users', users);
-				
+
 				// turn off drawing timer
 				clearTimeout(drawingTimer);
 				drawingTimer = null;
-				
+
 				// allow new user to draw
 				currentPlayer = null;
 				io.sockets.emit('youCanDraw');
 			}
 		}
 	});
-	
+
 	socket.on('nickChange', function (user) {
 		var sanitizedNick = sanitizer.sanitize(user.nick);
 		if(sanitizedNick != user.nick) {
@@ -142,20 +145,20 @@ io.sockets.on('connection', function (socket) {
 		if(!sanitizedNick || myNick == sanitizedNick || sanitizedNick.length>32 ) {
 			return;
 		}
-		
+
 		io.sockets.emit('nickChange', { newNick: sanitizedNick, oldNick: myNick, color: myColor });
 		myNick = sanitizedNick;
-		
+
 		for(var i = 0; i<users.length; i++) {
 			if(users[i].id == socket.id) {
 				users[i].nick = myNick;
 				break;
 			}
 		}
-		
+
 		io.sockets.emit('users', users);
 	});
-	
+
 	socket.on('disconnect', function () {
 		io.sockets.emit('userLeft', { nick: myNick, color: myColor });
 		for(var i = 0; i<users.length; i++) {
@@ -164,70 +167,57 @@ io.sockets.on('connection', function (socket) {
 				break;
 			}
 		}
-		
+
 		io.sockets.emit('users', users);
-		
+
 		if(currentPlayer == socket.id) {
 			// turn off drawing timer
 			clearTimeout(drawingTimer);
 			turnFinished();
 		}
 	});
-	
+
 	socket.on('draw', function (line) {
 		if(currentPlayer == socket.id) {
 			canvas.push(line);
 			socket.broadcast.emit('draw', line);
 		}
 	});
-	
+
 	socket.on('clearCanvas', function () {
 		if(currentPlayer == socket.id) {
 			canvas.splice(0, canvas.length);
 			io.sockets.emit('clearCanvas');
 		}
 	});
-	
-	socket.on('changeNickColor', function() {
-		myColor = rndColor();
-		
-		for(var i = 0; i<users.length; i++) {
-			if(users[i].id == socket.id) {
-				users[i].color = myColor;
-				break;
-			}
-		}
-		
-		io.sockets.emit('users', users);
-	});
-	
+
 	function rndColor() {
 		var color = '#'+(0x1000000+(Math.random())*0xffffff).toString(16).substr(1,6);
 		return color;
 	};
-	
+
 	function sortUsersByScore() {
 		users.sort(function(a,b) { return parseFloat(b.score) - parseFloat(a.score) } );
 	}
-	
+
 	// =================
 	// pictionary logic section
 	// =================
-	
+
 	socket.on('readyToDraw', function () {
 		if (!currentPlayer) {
 			currentPlayer = socket.id;
 			canvas.splice(0, canvas.length);
 			io.sockets.emit('clearCanvas');
-			
+
 			var randomLine = Math.floor(Math.random() * dictionary.length),
 				line = dictionary[randomLine],
 				word = line.split(',');
-			
+
 			currentWord = word[0];
 			socket.emit('youDraw', word);
-			io.sockets.emit('firendDraw', { color: myColor, nick: myNick });
-			
+			io.sockets.emit('friendDraw', { color: myColor, nick: myNick });
+
 			// set the timer for 2 minutes (120000ms)
 			drawingTimer = setTimeout( turnFinished, 120000 );
 		} else if (currentPlayer == socket.id) {
@@ -236,7 +226,7 @@ io.sockets.on('connection', function (socket) {
 			turnFinished();
 		}
 	});
-	
+
 	function turnFinished() {
 		drawingTimer = null;
 		currentPlayer = null;
