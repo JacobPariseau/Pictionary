@@ -22,7 +22,7 @@ body
 }
 
 .hide {
-	display: none;
+	opacity: 0 !important;
 }
 
 header.toolbar {
@@ -79,6 +79,7 @@ main {
 	background: #fff;
 	width: 100%;
 	margin: 0 auto;
+	max-width: 500px;
 }
 
 #canvas
@@ -118,13 +119,21 @@ span.ink {
 	width: 320px;
 	max-width: 90%;
 	margin: 0 auto;
+	position: fixed;
+	bottom: 4rem;
+	background: white;
+	left: 0;
+	right: 0;
+	padding: 0.5rem;
+	border-radius: 0.25rem;
+	box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+	opacity: 0.8;
+	transition: opacity 0.4s;
 }
+
 #chatcontent
 {
 	background: #fff;
-	border-radius:5px;
-	border:1px solid #ccc;
-	height:100px;
 	overflow: auto;
 	overflow-x: hidden;
 	padding-top:5px;
@@ -135,15 +144,18 @@ span.ink {
 #chatcontent p
 {
 	padding:0px;
-	margin-top:0px;
-	margin-bottom:5px;
+	margin-top:2px;
+	margin-bottom:0;
+	opacity: 0.6;
 }
 
+#chatcontent p:first-child {
+	opacity: 1 !important;
+}
 #chatnick
 {
 	border-radius:2px;
 	border:1px solid #ccc;
-	margin-top:10px;
 	padding:5px;
 	width:80px;
 }
@@ -152,8 +164,24 @@ span.ink {
 {
 	border-radius:2px;
 	border:1px solid #ccc;
-	margin-top:10px;
-	margin-left:10px;
 	padding:5px;
 	width:200px;
+}
+
+.action-bar {
+	position: fixed;
+	bottom:0.5rem;
+	left:0;
+	right:0;
+	text-align:center;
+}
+.action {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: none;
+  color: white;
+  background: #252525;
+	display:inline-block;
+	box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
 }

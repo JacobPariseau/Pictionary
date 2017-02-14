@@ -68,22 +68,22 @@ $(document).ready(function() {
 	}
 
 	socket.on('message', function(msg) {
-		chatcontent.append('<p><span style="color:' + msg.color + '">' + msg.nick + '</span>: ' + msg.text + '</p>');
+		chatcontent.prepend('<p><span style="color:' + msg.color + '">' + msg.nick + '</span>: ' + msg.text + '</p>');
 		chatScrollDown();
 	});
 
 	socket.on('userJoined', function (user) {
-		chatcontent.append('<p>&raquo; <span style="color:' + user.color + '">' + user.nick + '</span> joined. You can change your name by replacing \'guest\' in the box above.</p>');
+		chatcontent.prepend('<p>&raquo; <span style="color:' + user.color + '">' + user.nick + '</span> joined. You can change your name by replacing \'guest\' in the box above.</p>');
 		chatScrollDown();
 	});
 
 	socket.on('userLeft', function (user) {
-		chatcontent.append('<p>&raquo; <span style="color:' + user.color + '">' + user.nick + '</span> left.</p>');
+		chatcontent.prepend('<p>&raquo; <span style="color:' + user.color + '">' + user.nick + '</span> left.</p>');
 		chatScrollDown();
 	});
 
 	socket.on('nickChange', function (user) {
-		chatcontent.append('<p><span style="color:' + user.color + '">' + user.oldNick + '</span> changed his name to <span style="color:' + user.color + '">' + user.newNick + '</span></p>');
+		chatcontent.prepend('<p><span style="color:' + user.color + '">' + user.oldNick + '</span> changed his name to <span style="color:' + user.color + '">' + user.newNick + '</span></p>');
 		chatScrollDown();
 	});
 
@@ -221,10 +221,12 @@ $(document).ready(function() {
 	//                           pictionary logic section
 	// ================================================
 
-	var readytodraw = $('#readytodraw'),
-		myword = '',
-		timeleft = 120,
-		drawingTimer = null;
+	const createMessage = $('#create-message');
+	const chatGuess = $('#chat-guess');
+	const readytodraw = $('#readytodraw');
+	let myword = '';
+	let timeleft = 120;
+	let drawingTimer = null;
 
 	readytodraw.click(function() {
 		socket.emit('readyToDraw');
@@ -250,7 +252,7 @@ $(document).ready(function() {
 			status.text(room + ': ' + msg.nick + ' is drawing');
 		}
 
-		chatcontent.append('<p>&raquo; <span style="color:' + msg.color + '">' + msg.nick + '</span> is drawing!</p>');
+		chatcontent.prepend('<p>&raquo; <span style="color:' + msg.color + '">' + msg.nick + '</span> is drawing!</p>');
 		chatScrollDown();
 	});
 
@@ -260,20 +262,24 @@ $(document).ready(function() {
 			canvas.css('background-color', '#ccc');
 			status.text(room);
 		}
-		chatcontent.append('<p>Press <strong>DRAW</strong> to start drawing!</p>');
+		chatcontent.prepend('<p>Press <strong>DRAW</strong> to start drawing!</p>');
 		chatScrollDown();
 	});
 
 	socket.on('wordGuessed', function(msg) {
-		chatcontent.append('<p>&raquo; <span style="color:' + msg.color + '">' + msg.nick + '</span> guessed the word (<strong>' + msg.text + '</strong>) !!!</p>');
+		chatcontent.prepend('<p>&raquo; <span style="color:' + msg.color + '">' + msg.nick + '</span> guessed the word (<strong>' + msg.text + '</strong>) !!!</p>');
 		chatScrollDown();
 		resetTimer();
 	});
 
 	socket.on('wordNotGuessed', function(msg) {
-		chatcontent.append('<p>&raquo; The turn is over! The word was <strong>' + msg.text + '</strong>.</p>');
+		chatcontent.prepend('<p>&raquo; The turn is over! The word was <strong>' + msg.text + '</strong>.</p>');
 		chatScrollDown();
 		resetTimer();
+	});
+
+	createMessage.click(function () {
+		chatGuess.toggleClass('hide');
 	});
 
 	function timerTick() {
