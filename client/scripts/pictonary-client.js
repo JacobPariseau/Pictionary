@@ -243,10 +243,10 @@ $(document).ready(function() {
 
 		if(!myturn) {
 			console.log("Not you draw");
-			status.text(room + ': ' + msg.nick + ' is drawing');
+			status.text(room + ': ' + msg.nick + '\'s drawing');
 		}
 
-		chatcontent.prepend('<p>&raquo; <span style="color:' + msg.color + '">' + msg.nick + '</span> is drawing!</p>');
+		chatcontent.prepend('<p>&raquo; <span style="color:' + msg.color + '">' + msg.nick + '</span>\'s drawing!</p>');
 	});
 
 	socket.on('youCanDraw', function(msg) {
