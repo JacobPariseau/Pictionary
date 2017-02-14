@@ -131,7 +131,7 @@ $(document).ready(function() {
 			painting = true;
 			const x = e.pageX || e.targetTouches[0].pageX;
 			const y = e.pageY || e.targetTouches[0].pageY;
-			var newpoint = { x: x - this.offsetLeft, y: y - this.offsetTop},
+			var newpoint = { x: (x - this.offsetLeft) / this.width * this.offsetWidth, y: (y - this.offsetTop) / this.height * this.offsetHeight},
 				line = { from: null, to: newpoint, color: selectedcolor };
 
 			draw(line);
@@ -144,7 +144,7 @@ $(document).ready(function() {
 		if(myturn && painting) {
 			const x = e.pageX || e.targetTouches[0].pageX;
 			const y = e.pageY || e.targetTouches[0].pageY;
-			var newpoint = { x: x - this.offsetLeft, y: y - this.offsetTop},
+			var newpoint = { x: (x - this.offsetLeft) / this.width * this.offsetWidth, y: (y - this.offsetTop) / this.height * this.offsetHeight},
 				line = { from: lastpoint, to: newpoint, color: selectedcolor };
 
 			draw(line);
@@ -232,8 +232,6 @@ $(document).ready(function() {
 
 	socket.on('youDraw', function(word) {
 		console.log("You Draw");
-		//$('#gamepanel').removeClass('hide');
-		//$('#chatpanel').addClass('hide');
 		myturn = true;
 		canvas.css('background-color', '#f5f5f5');
 		context.clearRect ( 0 , 0 , canvas.width() , canvas.height() );
@@ -249,8 +247,6 @@ $(document).ready(function() {
 
 		if(!myturn) {
 			console.log("Not you draw");
-			//$('#chatpanel').removeClass('hide');
-			//$('#gamepanel').addClass('hide');
 			status.text(room + ': ' + msg.nick + ' is drawing');
 		}
 
@@ -271,21 +267,13 @@ $(document).ready(function() {
 	socket.on('wordGuessed', function(msg) {
 		chatcontent.append('<p>&raquo; <span style="color:' + msg.color + '">' + msg.nick + '</span> guessed the word (<strong>' + msg.text + '</strong>) !!!</p>');
 		chatScrollDown();
-		if(myturn = true) {
-			timeleft = 120;
-			clearInterval(drawingTimer);
-			drawingTimer = null;
-			readytodraw.prop('value', 'DRAW');
-		}
+		resetTimer();
 	});
 
 	socket.on('wordNotGuessed', function(msg) {
 		chatcontent.append('<p>&raquo; The turn is over! The word was <strong>' + msg.text + '</strong>.</p>');
 		chatScrollDown();
-			timeleft = 120;
-			clearInterval(drawingTimer);
-			drawingTimer = null;
-			readytodraw.prop('value', 'DRAW');
+		resetTimer();
 	});
 
 	function timerTick() {
@@ -293,10 +281,14 @@ $(document).ready(function() {
 			timeleft--;
 			readytodraw.prop('value', 'Pass (' + timeleft + ')');
 		} else {
-			timeleft = 120;
-			clearInterval(drawingTimer);
-			drawingTimer = null;
-			readytodraw.prop('value', 'DRAW');
+			resetTimer();
 		}
+	}
+
+	function resetTimer() {
+		timeleft = 120;
+		clearInterval(drawingTimer);
+		drawingTimer = null;
+		readytodraw.prop('value', 'DRAW');
 	}
 });
