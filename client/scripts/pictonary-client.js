@@ -209,7 +209,7 @@ $(document).ready(function() {
 	});
 
 	colorInk.click(function () {
-		selectedcolor = '#1e88e5';
+		selectedcolor = colorInk.css("background-color");
 	});
 
 	socket.on('clearCanvas', function() {
@@ -232,10 +232,12 @@ $(document).ready(function() {
 		socket.emit('readyToDraw');
 	});
 
-	socket.on('youDraw', function(word) {
+	socket.on('youDraw', function(word, colour) {
 		console.log("You Draw");
 		myturn = true;
 		canvas.css('background-color', '#f5f5f5');
+		colorInk.css('background-color', colour);
+		selectedcolor = '#252525';
 		context.clearRect ( 0 , 0 , canvas.width() , canvas.height() );
 		myword = word;
 		status.text(room + ': ' + myword[0]);

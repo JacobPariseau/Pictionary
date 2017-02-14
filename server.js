@@ -207,8 +207,16 @@ io.sockets.on('connection', function (socket) {
 	});
 
 	function rndColor() {
-		var color = '#'+(0x1000000+(Math.random())*0xffffff).toString(16).substr(1,6);
-		return color;
+		const colours = [
+			'#d32f2f',
+			'#8e24aa',
+			'#1976d2',
+			'#388e3c',
+			'#f9a825',
+			'#5d4037'
+		];
+
+		return colours[Math.floor(Math.random() * colours.length)]
 	};
 
 	function sortUsersByScore() {
@@ -230,7 +238,8 @@ io.sockets.on('connection', function (socket) {
 				word = line.split(',');
 
 			currentWord = word[0];
-			socket.emit('youDraw', word);
+			const colour = rndColor();
+			socket.emit('youDraw', word, colour);
 			io.sockets.emit('friendDraw', { color: myColor, nick: myNick });
 
 			// set the timer for 2 minutes (120000ms)
