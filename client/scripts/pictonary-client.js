@@ -122,12 +122,7 @@ $(document).ready(function() {
 		context.stroke();
 	}
 
-	// Disable text selection on the canvas
-	canvas.mousedown(function () {
-		return false;
-	});
-
-	canvas.mousedown(function(e) {
+	function drawInk(e) {
 		console.log(myturn);
 		if(myturn) {
 			painting = true;
@@ -138,9 +133,9 @@ $(document).ready(function() {
 			lastpoint = newpoint;
 			socket.emit('draw', line);
 		}
-	});
+	}
 
-	canvas.mousemove(function(e) {
+	function moveInk(e) {
 		if(myturn && painting) {
 			var newpoint = { x: e.pageX - this.offsetLeft, y: e.pageY - this.offsetTop},
 				line = { from: lastpoint, to: newpoint, color: selectedcolor };
@@ -149,15 +144,29 @@ $(document).ready(function() {
 			lastpoint = newpoint;
 			socket.emit('draw', line);
 		}
+	}
+
+	function stopInk(e) {
+		console.log('Stop');
+		painting = false;
+	}
+
+	// Disable text selection on the canvas
+	canvas.mousedown(function () {
+		return false;
 	});
 
-	canvas.mouseout(function(e) {
-		painting = false;
-	});
+	console.log(canvas);
+	canvas[0].addEventListener('mousedown', drawInk);
+	canvas[0].addEventListener('touchstart', drawInk);
 
-	canvas.mouseup(function(e) {
-		painting = false;
-	});
+	canvas[0].addEventListener('mousemove', moveInk);
+	canvas[0].addEventListener('touchmove', moveInk);
+
+	canvas[0].addEventListener('mouseout', stopInk);
+	canvas[0].addEventListener('mouseup', stopInk);
+	canvas[0].addEventListener('touchend', stopInk);
+	canvas[0].addEventListener('touchcancel', stopInk);
 
 	socket.on('drawCanvas', function(canvasToDraw) {
 		if(canvasToDraw) {
