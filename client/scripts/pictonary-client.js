@@ -169,7 +169,8 @@ $(document).ready(function() {
 	canvas[0].addEventListener('touchend', stopInk, true);
 	canvas[0].addEventListener('touchcancel', stopInk, true);
 
-	socket.on('drawCanvas', function(canvasToDraw) {
+	socket.on('drawCanvas', function(canvasToDraw, bgcolor) {
+		if(bgcolor) canvas.css('background-color',bgcolor);
 		if(canvasToDraw) {
 			//canvas.width(canvas.width());
 			context.lineJoin = 'round';
@@ -227,38 +228,39 @@ $(document).ready(function() {
 		socket.emit('readyToDraw');
 	});
 
-	socket.on('youDraw', function(word, colour) {
+	socket.on('youDraw', function(word, colour, bgcolor) {
 		console.log("You Draw");
 		myturn = true;
-		canvas.css('background-color', '#f5f5f5');
+		canvas.css('background-color', bgcolor);
 		colorInk.css('background-color', colour);
 		drawOptions.removeClass('hide');
 		selectedcolor = '#252525';
 		context.clearRect ( 0 , 0 , canvas.width() , canvas.height() );
 		myword = word;
 		status.text(room + ': ' + myword[0]);
-		readytodraw.prop('value', 'Pass (' + timeleft + ')');
-
-		// turn on drawing timer
-		drawingTimer = setInterval( timerTick, 1000 );
+		readytodraw.text('PASS (' + timeleft + ')');
 	});
 
 	socket.on('friendDraw', function(msg) {
-
+		canvas.css('background-color', msg.background);
 		if(!myturn) {
 			console.log("Not you draw");
 			status.text(room + ': ' + msg.nick + '\'s drawing');
 		}
 
+		// turn on drawing timer
+		drawingTimer = setInterval( timerTick, 1000 );
 		chatcontent.prepend('<p>&raquo; <span style="color:' + msg.color + '">' + msg.nick + '</span>\'s drawing!</p>');
 	});
 
 	socket.on('youCanDraw', function(msg) {
 		if(myturn) {
 			myturn = false;
-			canvas.css('background-color', '#ccc');
+			canvas.css('background-color', '#333');
 			status.text(room);
 		}
+		resetTimer();
+
 		chatcontent.prepend('<p>Press <strong>DRAW</strong> to start drawing!</p>');
 	});
 
@@ -289,7 +291,7 @@ $(document).ready(function() {
 	function timerTick() {
 		if(timeleft > 0) {
 			timeleft--;
-			readytodraw.prop('value', 'Pass (' + timeleft + ')');
+			readytodraw.text('PASS (' + timeleft + ')');
 		} else {
 			resetTimer();
 		}
@@ -300,6 +302,6 @@ $(document).ready(function() {
 		clearInterval(drawingTimer);
 		drawingTimer = null;
 
-		readytodraw.prop('value', 'DRAW');
+		readytodraw.text('DRAW');
 	}
 });

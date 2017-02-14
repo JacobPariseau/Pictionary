@@ -68,6 +68,7 @@ function handler (req, res) {
 // ================================================
 
 var users = [], canvas = [];
+let background;
 var dictionary, currentWord, currentPlayer, drawingTimer;
 
 // load dictionary.txt into memory
@@ -83,7 +84,8 @@ io.sockets.on('connection', function (socket) {
 	users.push({ id: socket.id, nick: myNick, color: myColor, score: myScore });
 	io.sockets.emit('userJoined', { nick: myNick, color: myColor });
 	io.sockets.emit('users', users);
-	socket.emit('drawCanvas', canvas);
+	console.log(background);
+	socket.emit('drawCanvas', canvas, background);
 
 	// notify if someone is drawing
 	if(currentPlayer) {
@@ -219,6 +221,19 @@ io.sockets.on('connection', function (socket) {
 		return colours[Math.floor(Math.random() * colours.length)]
 	};
 
+	function rndBackground() {
+		const colours = [
+			'#ffebee',
+			'#e8eaf6',
+			'#e3f2fd',
+			'#e0f2f1',
+			'#f1f8e9',
+			'#fff3e0'
+		];
+
+		return colours[Math.floor(Math.random() * colours.length)]
+	};
+
 	function sortUsersByScore() {
 		users.sort(function(a,b) { return parseFloat(b.score) - parseFloat(a.score) } );
 	}
@@ -239,8 +254,9 @@ io.sockets.on('connection', function (socket) {
 
 			currentWord = word[0];
 			const colour = rndColor();
-			socket.emit('youDraw', word, colour);
-			io.sockets.emit('friendDraw', { color: myColor, nick: myNick });
+			background = rndBackground();
+			socket.emit('youDraw', word, colour, background);
+			io.sockets.emit('friendDraw', { color: myColor, nick: myNick , background: background});
 
 			// set the timer for 2 minutes (120000ms)
 			drawingTimer = setTimeout( turnFinished, 120000 );

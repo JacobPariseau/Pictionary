@@ -36,6 +36,7 @@ header.toolbar {
 	  -webkit-flex-direction: row;
 	  -ms-flex-direction: row;
 	  flex-direction: row;
+		z-index: 3;
 }
 
 #status
@@ -55,7 +56,8 @@ header.toolbar {
   overflow: hidden;
 }
 
-#readytodraw {
+button,
+input[type="button"] {
 	background: none;
 	border: none;
 	padding: 0 0.5rem;
@@ -64,6 +66,12 @@ header.toolbar {
 	font-size: 1rem;
 	opacity: 0.8;
 	cursor: pointer;
+	transition: background 0.4s;
+}
+
+button:hover,
+input[type="button"]:hover {
+	background: rgba(0,0,0,0.24);
 }
 
 main {
@@ -77,20 +85,25 @@ main {
 /* second panel section */
 /* -------------------------- */
 
+.top {
+	background: #333;
+}
 #gamepanel
 {
-	background: #fff;
 	width: 100%;
 	margin: 0 auto;
 	max-width: 400px;
+	max-height: 400px;
 	position: relative;
+
 }
 
 #canvas
 {
+	background:#333;
 	cursor:crosshair;
-	background:#ccc;
 	width: 100%;
+	transition: background 1s;
 }
 
 #draw-options {
@@ -122,7 +135,10 @@ span.ink {
 /* ---------------------- */
 /* third panel section */
 /* ---------------------- */
-
+.bottom {
+	box-shadow: 0 -3px 5px 0 rgba(0, 0, 0, 0.26);
+	z-index: 3;
+}
 .guess {
 	width: 320px;
 	max-width: 90%;
@@ -178,19 +194,37 @@ span.ink {
 }
 
 .action-bar {
+	background: white;
 	position: fixed;
-	bottom:0.5rem;
+	bottom:0rem;
 	left:0;
 	right:0;
 	text-align:center;
+	box-shadow: 0 -3px 5px 0 rgba(0, 0, 0, 0.26);
+  height: 2.5rem;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-flex-direction: row;
+	-ms-flex-direction: row;
+	flex-direction: row;
 }
 .action {
   width: 3rem;
   height: 3rem;
+	margin: 0 10%;
   border-radius: 50%;
-  border: none;
+	opacity: 1;
   color: white;
-  background: #252525;
+  background: #252525 !important;
 	display:inline-block;
 	box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+	transform: translateY(-40%);
+	-webkit-transform: translateY(-40%);
+}
+
+.action-bar .box {
+	flex: 1;
+	-ms-flex: 1;
+	-webkit-flex: 1;
 }
