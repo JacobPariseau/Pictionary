@@ -11,7 +11,7 @@ $(document).ready(function() {
 	const chatPanel = $('#chatPanel');
 
 	socket.on('connect', function () {
-		status.text(room + ': Nobody is drawing right now');
+		status.text(room);
 		chatinput.removeProp('disabled');
 		chatnick.removeProp('disabled');
 		chatinput.focus();
@@ -107,7 +107,7 @@ $(document).ready(function() {
 
 	function draw(line) {
 		context.lineJoin = 'round';
-		context.lineWidth = 4;
+		context.lineWidth = 5;
 		context.strokeStyle = line.color;
 		context.beginPath();
 
@@ -176,7 +176,7 @@ $(document).ready(function() {
 		if(canvasToDraw) {
 			//canvas.width(canvas.width());
 			context.lineJoin = 'round';
-			context.lineWidth = 4;
+			context.lineWidth = 5;
 
 			for(var i=0; i < canvasToDraw.length; i++)
 			{
@@ -259,7 +259,7 @@ $(document).ready(function() {
 		if(myturn) {
 			myturn = false;
 			canvas.css('background-color', '#ccc');
-			status.text(room + ': Nobody is drawing right now');
+			status.text(room);
 		}
 		chatcontent.append('<p>Press <strong>DRAW</strong> to start drawing!</p>');
 		chatScrollDown();
