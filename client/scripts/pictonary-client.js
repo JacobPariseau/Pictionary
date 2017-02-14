@@ -126,7 +126,9 @@ $(document).ready(function() {
 		console.log(myturn);
 		if(myturn) {
 			painting = true;
-			var newpoint = { x: e.pageX - this.offsetLeft, y: e.pageY - this.offsetTop},
+			const x = e.pageX || e.targetTouches[0].pageX;
+			const y = e.pageY || e.targetTouches[0].pageY;
+			var newpoint = { x: x - this.offsetLeft, y: y - this.offsetTop},
 				line = { from: null, to: newpoint, color: selectedcolor };
 
 			draw(line);
@@ -137,7 +139,9 @@ $(document).ready(function() {
 
 	function moveInk(e) {
 		if(myturn && painting) {
-			var newpoint = { x: e.pageX - this.offsetLeft, y: e.pageY - this.offsetTop},
+			const x = e.pageX || e.targetTouches[0].pageX;
+			const y = e.pageY || e.targetTouches[0].pageY;
+			var newpoint = { x: x - this.offsetLeft, y: y - this.offsetTop},
 				line = { from: lastpoint, to: newpoint, color: selectedcolor };
 
 			draw(line);
