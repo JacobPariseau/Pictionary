@@ -82,7 +82,8 @@ main {
 	background: #fff;
 	width: 100%;
 	margin: 0 auto;
-	max-width: 500px;
+	max-width: 400px;
+	position: relative;
 }
 
 #canvas
@@ -92,6 +93,10 @@ main {
 	width: 100%;
 }
 
+#draw-options {
+	position: absolute;
+	bottom: 0;
+}
 span.ink {
 	display: inline-block;
 	height: 2rem;

@@ -10,8 +10,8 @@ $(document).ready(function() {
 		chatinput = $('#chatinput'),
 		chatnick = $('#chatnick');
 
-	const gamePanel = $('#gamePanel');
-	const chatPanel = $('#chatPanel');
+	const gamePanel = $('#gamepanel');
+	const chatPanel = $('#chatpanel');
 
 	socket.on('connect', function () {
 		status.text(room);
@@ -101,6 +101,7 @@ $(document).ready(function() {
 	socket.on('draw', draw);
 
 	function draw(line) {
+		console.log(line);
 		context.lineJoin = 'round';
 		context.lineWidth = 5;
 		context.strokeStyle = line.color;
@@ -118,12 +119,11 @@ $(document).ready(function() {
 	}
 
 	function drawInk(e) {
-		console.log(myturn);
 		if(myturn) {
 			painting = true;
 			const x = e.pageX || e.targetTouches[0].pageX;
 			const y = e.pageY || e.targetTouches[0].pageY;
-			var newpoint = { x: (x - this.offsetLeft) / this.offsetWidth * this.width, y: (y - this.offsetTop) / this.offsetHeight * this.height},
+			var newpoint = { x: (x - gamePanel[0].offsetLeft) / this.offsetWidth * this.width, y: (y - gamePanel[0].offsetTop) / this.offsetHeight * this.height},
 				line = { from: null, to: newpoint, color: selectedcolor };
 
 			draw(line);
@@ -134,9 +134,11 @@ $(document).ready(function() {
 
 	function moveInk(e) {
 		if(myturn && painting) {
+			console.log(gamePanel[0]);
+			console.log(gamePanel[0].offsetLeft);
 			const x = e.pageX || e.targetTouches[0].pageX;
 			const y = e.pageY || e.targetTouches[0].pageY;
-			var newpoint = { x: (x - this.offsetLeft) / this.offsetWidth * this.width, y: (y - this.offsetTop) / this.offsetHeight * this.height},
+			var newpoint = { x: (x - gamePanel[0].offsetLeft) / this.offsetWidth * this.width, y: (y - gamePanel[0].offsetTop) / this.offsetHeight * this.height},
 				line = { from: lastpoint, to: newpoint, color: selectedcolor };
 
 			draw(line);
@@ -216,6 +218,7 @@ $(document).ready(function() {
 	const createMessage = $('#create-message');
 	const chatGuess = $('#chat-guess');
 	const readytodraw = $('#readytodraw');
+	const drawOptions = $('#draw-options');
 	let myword = '';
 	let timeleft = 120;
 	let drawingTimer = null;
@@ -229,6 +232,7 @@ $(document).ready(function() {
 		myturn = true;
 		canvas.css('background-color', '#f5f5f5');
 		colorInk.css('background-color', colour);
+		drawOptions.removeClass('hide');
 		selectedcolor = '#252525';
 		context.clearRect ( 0 , 0 , canvas.width() , canvas.height() );
 		myword = word;
@@ -260,16 +264,26 @@ $(document).ready(function() {
 
 	socket.on('wordGuessed', function(msg) {
 		chatcontent.prepend('<p>&raquo; <span style="color:' + msg.color + '">' + msg.nick + '</span> guessed the word (<strong>' + msg.text + '</strong>) !!!</p>');
+		drawOptions.addClass('hide');
 		resetTimer();
 	});
 
 	socket.on('wordNotGuessed', function(msg) {
 		chatcontent.prepend('<p>&raquo; The turn is over! The word was <strong>' + msg.text + '</strong>.</p>');
+		drawOptions.addClass('hide');
 		resetTimer();
 	});
 
 	createMessage.click(function () {
 		chatGuess.toggleClass('hide');
+	});
+
+	document.addEventListener('keyup', function (e) {
+		if(e.keyCode == 13) {
+			//User has pressed the tab key
+			e.preventDefault();
+			chatGuess.toggleClass('hide');
+		}
 	});
 
 	function timerTick() {
@@ -285,6 +299,7 @@ $(document).ready(function() {
 		timeleft = 120;
 		clearInterval(drawingTimer);
 		drawingTimer = null;
+
 		readytodraw.prop('value', 'DRAW');
 	}
 });
