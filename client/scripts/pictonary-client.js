@@ -270,7 +270,7 @@ $(document).ready(function() {
 			timeleft = 120;
 			clearInterval(drawingTimer);
 			drawingTimer = null;
-			readytodraw.prop('value', 'Ready to draw!');
+			readytodraw.prop('value', 'DRAW');
 		}
 	});
 
@@ -282,7 +282,7 @@ $(document).ready(function() {
 			timeleft = 120;
 			clearInterval(drawingTimer);
 			drawingTimer = null;
-			readytodraw.prop('value', 'Ready to draw!');
+			readytodraw.prop('value', 'DRAW');
 		}
 	}
 });
