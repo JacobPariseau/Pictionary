@@ -99,6 +99,21 @@ io.sockets.on('connection', function (socket) {
 	// chat logic section
 	// =============
 
+	function compareWords(variable, control) {
+		variable = variable.toLowerCase();
+
+		//Remove spaces from query (allows 'base ball' to match baseball)
+		variable = variable.replace(/\s/g, '');
+
+		//Reduce to length of control
+		variable = variable.substr(0, control.length);
+
+		console.log('Comparing ' + variable + ' to ' + control);
+		if(variable === control) {
+			return true;
+		} else return false;
+	}
+
 	socket.on('message', function (msg) {
 		var sanitizedMsg = sanitizer.sanitize(msg.text);
 		if(sanitizedMsg != msg.text) {
@@ -112,7 +127,7 @@ io.sockets.on('connection', function (socket) {
 
 		// check if current word was guessed
 		if(currentPlayer != null && currentPlayer != socket.id) {
-			if(sanitizedMsg.toLowerCase().trim() == currentWord) {
+			if(compareWords(sanitizedMsg, currentWord)) {
 				io.sockets.emit('wordGuessed', { text: currentWord, color: myColor, nick: myNick });
 
 				// add scores to guesser and drawer
