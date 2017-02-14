@@ -157,16 +157,16 @@ $(document).ready(function() {
 	});
 
 	console.log(canvas);
-	canvas[0].addEventListener('mousedown', drawInk);
-	canvas[0].addEventListener('touchstart', drawInk);
+	canvas[0].addEventListener('mousedown', drawInk, true);
+	canvas[0].addEventListener('touchstart', drawInk, true);
 
-	canvas[0].addEventListener('mousemove', moveInk);
-	canvas[0].addEventListener('touchmove', moveInk);
+	canvas[0].addEventListener('mousemove', moveInk, true);
+	canvas[0].addEventListener('touchmove', moveInk, true);
 
-	canvas[0].addEventListener('mouseout', stopInk);
-	canvas[0].addEventListener('mouseup', stopInk);
-	canvas[0].addEventListener('touchend', stopInk);
-	canvas[0].addEventListener('touchcancel', stopInk);
+	canvas[0].addEventListener('mouseout', stopInk, true);
+	canvas[0].addEventListener('mouseup', stopInk, true);
+	canvas[0].addEventListener('touchend', stopInk, true);
+	canvas[0].addEventListener('touchcancel', stopInk, true);
 
 	socket.on('drawCanvas', function(canvasToDraw) {
 		if(canvasToDraw) {
