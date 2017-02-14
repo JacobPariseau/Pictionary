@@ -70,7 +70,7 @@ $(document).ready(function() {
 	});
 
 	socket.on('userJoined', function (user) {
-		chatcontent.append('<p>&raquo; <span style="color:' + user.color + '">' + user.nick + '</span> joined.</p>');
+		chatcontent.append('<p>&raquo; <span style="color:' + user.color + '">' + user.nick + '</span> joined. You can change your name by replacing \'guest\' in the box above.</p>');
 		chatScrollDown();
 	});
 
@@ -80,7 +80,7 @@ $(document).ready(function() {
 	});
 
 	socket.on('nickChange', function (user) {
-		chatcontent.append('<p><span style="color:' + user.color + '">' + user.oldNick + '</span> changed his nick to <span style="color:' + user.color + '">' + user.newNick + '</span></p>');
+		chatcontent.append('<p><span style="color:' + user.color + '">' + user.oldNick + '</span> changed his name to <span style="color:' + user.color + '">' + user.newNick + '</span></p>');
 		chatScrollDown();
 	});
 
@@ -94,17 +94,20 @@ $(document).ready(function() {
 
 	var canvas = $('#canvas'),
 		clearcanvas = $('#clearcanvas'),
-		selectedcolor = $('.color'),
 		context = canvas[0].getContext('2d'),
 		lastpoint = null,
 		painting = false,
 		myturn = false;
 
+	const blackInk = $('#black-ink');
+	const colorInk = $('#color-ink');
+
+	let selectedcolor = '#252525';
 	socket.on('draw', draw);
 
 	function draw(line) {
 		context.lineJoin = 'round';
-		context.lineWidth = 2;
+		context.lineWidth = 4;
 		context.strokeStyle = line.color;
 		context.beginPath();
 
@@ -129,7 +132,7 @@ $(document).ready(function() {
 		if(myturn) {
 			painting = true;
 			var newpoint = { x: e.pageX - this.offsetLeft, y: e.pageY - this.offsetTop},
-				line = { from: null, to: newpoint, color: selectedcolor.val() };
+				line = { from: null, to: newpoint, color: selectedcolor };
 
 			draw(line);
 			lastpoint = newpoint;
@@ -140,7 +143,7 @@ $(document).ready(function() {
 	canvas.mousemove(function(e) {
 		if(myturn && painting) {
 			var newpoint = { x: e.pageX - this.offsetLeft, y: e.pageY - this.offsetTop},
-				line = { from: lastpoint, to: newpoint, color: selectedcolor.val() };
+				line = { from: lastpoint, to: newpoint, color: selectedcolor };
 
 			draw(line);
 			lastpoint = newpoint;
@@ -160,7 +163,7 @@ $(document).ready(function() {
 		if(canvasToDraw) {
 			//canvas.width(canvas.width());
 			context.lineJoin = 'round';
-			context.lineWidth = 2;
+			context.lineWidth = 4;
 
 			for(var i=0; i < canvasToDraw.length; i++)
 			{
@@ -183,6 +186,14 @@ $(document).ready(function() {
 		if(myturn) {
 			socket.emit('clearCanvas');
 		}
+	});
+
+	blackInk.click(function () {
+		selectedcolor = '#252525';
+	});
+
+	colorInk.click(function () {
+		selectedcolor = '#1e88e5';
 	});
 
 	socket.on('clearCanvas', function() {
@@ -208,10 +219,10 @@ $(document).ready(function() {
 		//$('#gamepanel').removeClass('hide');
 		//$('#chatpanel').addClass('hide');
 		myturn = true;
-		canvas.css('background-color', '#fff');
+		canvas.css('background-color', '#f5f5f5');
 		context.clearRect ( 0 , 0 , canvas.width() , canvas.height() );
 		myword = word;
-		status.text(room + ': Your word is: ' + myword[0] + ' (difficulty: ' + myword[1] + ')');
+		status.text(room + ': ' + myword[0] + ' (difficulty: ' + myword[1] + ')');
 		readytodraw.prop('value', 'Pass (' + timeleft + ')');
 
 		// turn on drawing timer

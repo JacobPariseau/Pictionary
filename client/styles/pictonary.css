@@ -7,46 +7,68 @@ body
 	background: #fff;
 	font-family: 'Roboto', sans-serif;
 	font-size: 12px;
+	margin: 0;
 }
 
 .hide {
 	display: none;
 }
 
-#main
-{
-	width: 100%;
-	max-width: 1000px;
-	margin-left:auto;
-	margin-right:auto;
-	margin-top:10px;
+header.toolbar {
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+    margin: 0 auto 1rem auto;
+    line-height: 1.4rem;
+		position: relative;
+		display: -webkit-flex;
+	  display: -ms-flexbox;
+	  display: flex;
+	  -webkit-flex-direction: row;
+	  -ms-flex-direction: row;
+	  flex-direction: row;
 }
 
 #status
 {
-	padding:5px;
-	margin-bottom:15px;
+	font-size: 1.3rem;
+	line-height: 4rem;
+	font-weight: normal;
 	color: black;
-	font-size:15px;
+	opacity:0.8;
+	margin: 0 1rem;
+	padding: 0;
+	flex: 1;
+	-ms-flex: 1;
+	-webkit-flex: 1;
+}
+
+#readytodraw {
+	background: none;
+	border: none;
+	padding: 0 0.5rem;
+	font-weight: 500;
+	font-family: 'Roboto', sans-serif;
+	font-size: 1rem;
+	opacity: 0.8;
+	cursor: pointer;
+}
+
+main {
+	width: 100%;
+	max-width: 1000px;
+	margin-left:auto;
+	margin-right:auto;
 }
 
 /* -------------------------- */
 /* second panel section */
 /* -------------------------- */
 
-section.top {
-	height: 320px;
-}
-
 #gamepanel
 {
 	background: #fff;
 	width:300px;
-	box-sizing: border-box;
-	border-radius:5px;
-	border:2px solid #ccc;
-	margin-left:30px;
-	float:left;
+	margin: 0 auto;
+	padding: 0.5rem;
 }
 
 #canvas
@@ -55,23 +77,42 @@ section.top {
 	background:#ccc;
 }
 
+span.ink {
+	display: inline-block;
+	height: 2rem;
+	width: 2rem;
+	margin: 0 0.25rem;
+	cursor: pointer;
+	border-radius: 50%;
+	transition: border-radius 0.5s;
+	-webkit-transition: border-radius 0.5s;
+}
+
+.ink:hover {
+	border-radius: 0;
+}
+
+.black {
+	background: #252525;
+}
+
+.color {
+	background: #039be5;
+}
 /* ---------------------- */
 /* third panel section */
 /* ---------------------- */
 
-#chatpanel
-{
-	margin-left:30px;
-	float:left;
-	width:320px;
+.guess {
+	width: 320px;
+	max-width: 90%;
+	margin: 0 auto;
 }
-
 #chatcontent
 {
 	background: #fff;
 	border-radius:5px;
 	border:1px solid #ccc;
-	width:310px;
 	height:100px;
 	overflow: auto;
 	overflow-x: hidden;
@@ -94,7 +135,6 @@ section.top {
 	margin-top:10px;
 	padding:5px;
 	width:80px;
-	float:left;
 }
 
 #chatinput
@@ -105,13 +145,4 @@ section.top {
 	margin-left:10px;
 	padding:5px;
 	width:200px;
-	float:left;
-}
-
-#clearchat,
-#changenickcolor,
-#readytodraw
-{
-	margin-top:10px;
-	padding:5px;
 }

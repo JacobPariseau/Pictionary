@@ -5,29 +5,39 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 		<title>Dr. Ink</title>
 		<link rel="stylesheet" type="text/css" href="styles/pictonary.css" />
+		<link href="https://fonts.googleapis.com/css?family=Roboto:400,500" rel="stylesheet">
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.min.js"></script>
 		<script type="text/javascript" src="scripts/jquery-1.7.2.min.js"></script>
 		<script type="text/javascript" src="scripts/pictonary-client.js"></script>
 		<script type="text/javascript" src="scripts/jscolor/jscolor.js"></script>
 	</head>
 	<body>
-		<div id="main">
-			<header>
-				<span id="status">Welcome :)</span>
-				<input type="button" id="readytodraw" value="DRAW" />
-			</header>
+		<header class="toolbar">
+			<h2 id="status">Welcome :)</h2>
+			<input type="button" id="readytodraw" value="DRAW" />
+		</header>
+		<main>
 			<section class="top">
 				<div id="gamepanel">
 					<canvas id="canvas" width="300" height="300"></canvas>
 				</div>
+				<footer class="options">
+					<panel>
+						<span id="black-ink" class="ink black"></span>
+						<span id="color-ink" class="ink color"></span>
+					</panel>
+				</footer>
 			</section>
 			<section class="bottom">
 				<div id="chatpanel">
-					<input type="text" id="chatnick" disabled="disabled" value="guest" maxlength="32" />
-					<input type="text" id="chatinput" disabled="disabled" maxlength="256" /><br/>
+					<div class="guess">
+						<input type="text" id="chatnick" disabled="disabled" value="guest" maxlength="32" />
+						<input type="text" id="chatinput" disabled="disabled" maxlength="256" />
+					</div>
+
 					<div id="chatcontent"></div>
 				</div>
 			</section>
-		</div>
+		</main>
 	</body>
 </html>
