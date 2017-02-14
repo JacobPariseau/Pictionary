@@ -27,7 +27,7 @@ body
 
 header.toolbar {
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
-    margin: 0 auto 1rem auto;
+    margin: 0 auto;
     line-height: 1.4rem;
 		position: relative;
 		display: -webkit-flex;
@@ -77,15 +77,15 @@ main {
 #gamepanel
 {
 	background: #fff;
-	width:300px;
+	width: 100%;
 	margin: 0 auto;
-	padding: 0.5rem;
 }
 
 #canvas
 {
 	cursor:crosshair;
 	background:#ccc;
+	width: 100%;
 }
 
 span.ink {

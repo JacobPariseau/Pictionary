@@ -238,7 +238,7 @@ $(document).ready(function() {
 		canvas.css('background-color', '#f5f5f5');
 		context.clearRect ( 0 , 0 , canvas.width() , canvas.height() );
 		myword = word;
-		status.text(room + ': ' + myword[0] + ' (difficulty: ' + myword[1] + ')');
+		status.text(room + ': ' + myword[0]);
 		readytodraw.prop('value', 'Pass (' + timeleft + ')');
 
 		// turn on drawing timer
@@ -251,7 +251,7 @@ $(document).ready(function() {
 			console.log("Not you draw");
 			//$('#chatpanel').removeClass('hide');
 			//$('#gamepanel').addClass('hide');
-			status.text(room + ': ' + msg.nick + ' is drawing right now!');
+			status.text(room + ': ' + msg.nick + ' is drawing');
 		}
 
 		chatcontent.append('<p>&raquo; <span style="color:' + msg.color + '">' + msg.nick + '</span> is drawing!</p>');
@@ -282,12 +282,10 @@ $(document).ready(function() {
 	socket.on('wordNotGuessed', function(msg) {
 		chatcontent.append('<p>&raquo; The turn is over! The word was <strong>' + msg.text + '</strong>.</p>');
 		chatScrollDown();
-		if(myturn = true) {
 			timeleft = 120;
 			clearInterval(drawingTimer);
 			drawingTimer = null;
 			readytodraw.prop('value', 'DRAW');
-		}
 	});
 
 	function timerTick() {
