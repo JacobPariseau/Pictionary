@@ -2,7 +2,7 @@ $(document).ready(function() {
 	if (screenfull.enabled) {
     screenfull.request();
 	}
-	const room = document.URL.substr(document.origin.length + 1).toUpperCase();
+	const room = window.location.pathname.substring(1).toUpperCase();
 	console.log("You have entered room " + room);
 	var socket = io.connect('/');
 
