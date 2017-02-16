@@ -5,40 +5,35 @@ const mongo = require('mongodb');
 const Server = mongo.Server;
 const DB = mongo.Db;
 const BSON = mongo.BSONPure;
-
-const server = new Server('localhost', 27017, {auto_reconnect: true});
+const DBPATH = require('./dbpath');
+const server = new Server(DBPATH, 27017, {auto_reconnect: true});
 let db = new DB('doctorink', server);
 
 db.open(function(err, db) {
-  db.authenticate('user', 'Beatrice', function (err, result) {
-    console.log(err);
-    console.log(result);
+	if(!err) {
+		console.log("Connected to Dr.Ink database");
+		db.collection('games', {strict: true}, function (err, col) {
+      console.log('The games collection doesn\'t exist. Loading up now');
+      //Reset all sessions
+      col.remove({}, {multi: true});
 
-  	if(!err) {
-  		console.log("Connected to Dr.Ink database");
-  		db.collection('games', {strict: true}, function (err, col) {
-        console.log('The games collection doesn\'t exist. Loading up now');
-        //Reset all sessions
-        col.remove({}, {multi: true});
+			if(err) {
+        db.collection('games', function (err, collection) {
 
-  			if(err) {
-          db.collection('games', function (err, collection) {
+          collection.insert({
+            name: 'SAMPLE',
+            users: [],
+            canvas: [],
+            background: "",
+            currentWord: "",
+            currentPlayer: "",
+            drawingTimer: 0
+          }, {safe: true});
+        });
+      }
 
-            collection.insert({
-              name: 'SAMPLE',
-              users: [],
-              canvas: [],
-              background: "",
-              currentWord: "",
-              currentPlayer: "",
-              drawingTimer: 0
-            }, {safe: true});
-          });
-        }
-
-  		});
-  	}
-  });
+		});
+	}
 });
 
 exports.checkGame = checkGame;
