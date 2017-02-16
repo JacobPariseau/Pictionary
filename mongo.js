@@ -168,4 +168,4 @@ fs.readFile(__dirname + '/dbpath', function (err, data) {
       });
     });
   }
-};
+});
