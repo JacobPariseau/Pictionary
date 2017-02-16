@@ -123,7 +123,10 @@ $(document).ready(function() {
 		}
 		const weightedPeriod = 30;
 		let point = {};
-
+		let delta = {
+			x: 0,
+			y: 0
+		};
 		if(points.length > weightedPeriod) {
 			//There are more than weightedPeriod points in the list
 			//Calculate the destination. The source is == the last destination.
@@ -137,16 +140,16 @@ $(document).ready(function() {
 					point.to.x += points[i].to.x * (weightedPeriod - i);
 					point.to.y += points[i].to.y * (weightedPeriod - i);
 			}
-
 			//Divide the sum to get the average
 			point.to.x /= (( weightedPeriod * ( weightedPeriod + 1 )) / 2 );
 			point.to.y /= (( weightedPeriod * ( weightedPeriod + 1 )) / 2 );
+			delta.x = Math.abs(point.to.x - points[0].to.x);
+			delta.y = Math.abs(point.to.y - points[0].to.y);
 
 			//Set the next source to the current destination
 			points[1].from = point.to;
 			//Remove the last point from the list so we're only smoothing recents
 			points = points.splice(1);
-			console.log(point);
 		} else {
 			//There is not enough data, start from scratch
 			point = {
@@ -166,15 +169,19 @@ $(document).ready(function() {
 					point.to.x += points[i].to.x * (points.length - i);
 					point.to.y += points[i].to.y * (points.length - i);
 			}
-			console.log(point);
 			point.from.x /= (( points.length * ( points.length + 1 )) / 2 );
 			point.from.y /= (( points.length * ( points.length + 1 )) / 2 );
 			point.to.x /= (( points.length * ( points.length + 1 )) / 2 );
 			point.to.y /= (( points.length * ( points.length + 1 )) / 2 );
+			delta.x = Math.abs(point.to.x - points[0].to.x);
+			delta.y = Math.abs(point.to.y - points[0].to.y);
+
 		}
+		let velocity =  Math.cbrt(Math.pow(delta.x, 2) + Math.pow(delta.y, 2));
+		console.log(velocity);
 
 		context.lineJoin = 'round';
-		context.lineWidth = 5;
+		context.lineWidth =velocity + 1;
 		context.strokeStyle = line.color;
 		context.beginPath();
 
@@ -200,13 +207,15 @@ $(document).ready(function() {
 				catchUp();
 			}, 16);
 		} else {
-			console.log("No points left");
 		}
 	}
 
 	function catchUp() {
-		console.log(points.length);
 		let point;
+		let delta = {
+			x: 0,
+			y: 0
+		};
 		if(points.length > 1) {
 			//There are more than weightedPeriod points in the list
 			//Calculate the destination. The source is == the last destination.
@@ -224,14 +233,16 @@ $(document).ready(function() {
 			//Divide the sum to get the average
 			point.to.x /= (( points.length * ( points.length + 1 )) / 2 );
 			point.to.y /= (( points.length * ( points.length + 1 )) / 2 );
-
+			delta.x = Math.abs(point.to.x - points[0].to.x);
+			delta.y = Math.abs(point.to.y - points[0].to.y);
+			let velocity =  Math.cbrt(Math.pow(delta.x, 2) + Math.pow(delta.y, 2));
 			//Set the next source to the current destination
 			points[1].from = point.to;
 			//Remove the last point from the list so we're only smoothing recents
 			points = points.splice(1);
 
 			context.lineJoin = 'round';
-			context.lineWidth = 5;
+			context.lineWidth = velocity + 1;
 			context.strokeStyle = point.color;
 			context.beginPath();
 			if(point.from && point.from.x) {
@@ -311,7 +322,6 @@ $(document).ready(function() {
 		if(canvasToDraw) {
 			//canvas.width(canvas.width());
 			context.lineJoin = 'round';
-			context.lineWidth = 5;
 
 			for(var i=0; i < canvasToDraw.length; i++)
 			{
@@ -319,6 +329,8 @@ $(document).ready(function() {
 				var line = canvasToDraw[i];
 				if(line.stop) continue;
 				context.strokeStyle = line.color;
+				context.lineWidth = 10;
+
 				context.beginPath();
 				if(line.from){
 					context.moveTo(line.from.x, line.from.y);
