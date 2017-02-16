@@ -13,8 +13,9 @@ $(document).ready(function() {
 	const gamePanel = $('#gamepanel');
 	const chatPanel = $('#chatpanel');
 	const modal = $('#modal');
-	const yourWord = $('#your-word');
 	const modalOk = $('#modal-ok');
+	const modalHeader = $('#modal-header');
+	const modalText = $('#modal-text');
 
 	socket.on('connect', function () {
 		status.text(room);
@@ -395,7 +396,8 @@ $(document).ready(function() {
 		readytodraw.text('PASS (' + timeleft + ')');
 		modal.removeClass('hide');
 		modalOk.text('START DRAWING');
-		yourWord.text(word[0]);
+		modalHeader.text('It\'s your turn!');
+		modalText.text('Your word is ' + word[0] + '! and the timer is already counting!');
 	});
 
 	socket.on('friendDraw', function(msg) {
@@ -425,12 +427,20 @@ $(document).ready(function() {
 		chatcontent.prepend('<p>&raquo; <span style="color:' + msg.color + '">' + msg.nick + '</span> guessed the word (<strong>' + msg.text + '</strong>) !!!</p>');
 		drawOptions.addClass('hide');
 		resetTimer();
+		modal.removeClass('hide');
+		modalOk.text('OKAY');
+		modalHeader.text('Round over!')
+		modalText.text(msg.nick + ' guessed the word (' + msg.text + ') !!!');
 	});
 
 	socket.on('wordNotGuessed', function(msg) {
 		chatcontent.prepend('<p>&raquo; The turn is over! The word was <strong>' + msg.text + '</strong>.</p>');
 		drawOptions.addClass('hide');
 		resetTimer();
+		modal.removeClass('hide');
+		modalOk.text('AWW OKAY');
+		modalHeader.text('Nobody Wins!');
+		modalText.text('The turn is over! The word was ' + msg.text + '.')
 	});
 
 	createMessage.click(function () {
