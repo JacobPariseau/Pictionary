@@ -19,22 +19,11 @@ fs.readFile(__dirname + '/dbpath', function (err, data) {
   		console.log("Connected to Dr.Ink database");
   		db.collection('games', {strict: true}, function (err, col) {
         console.log('The games collection doesn\'t exist. Loading up now');
-        //Reset all sessions
-        col.remove({}, {multi: true});
 
   			if(err) {
-          db.collection('games', function (err, collection) {
-
-            collection.insert({
-              name: 'SAMPLE',
-              users: [],
-              canvas: [],
-              background: "",
-              currentWord: "",
-              currentPlayer: "",
-              drawingTimer: 0
-            }, {safe: true});
-          });
+        } else {
+          //Reset all sessions
+          col.remove({}, {multi: true});
         }
 
   		});
