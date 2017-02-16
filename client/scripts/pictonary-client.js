@@ -12,6 +12,9 @@ $(document).ready(function() {
 
 	const gamePanel = $('#gamepanel');
 	const chatPanel = $('#chatpanel');
+	const modal = $('#modal');
+	const yourWord = $('#your-word');
+	const modalOk = $('#modal-ok');
 
 	socket.on('connect', function () {
 		status.text(room);
@@ -387,9 +390,12 @@ $(document).ready(function() {
 		drawOptions.removeClass('hide');
 		selectedcolor = '#252525';
 		context.clearRect ( 0 , 0 , canvas.width() , canvas.height() );
-		myword = word;
-		status.text(room + ': ' + myword[0]);
+
+		status.text(room + ': ' + word[0]);
 		readytodraw.text('PASS (' + timeleft + ')');
+		modal.removeClass('hide');
+		modalOk.text('START DRAWING');
+		yourWord.text(word[0]);
 	});
 
 	socket.on('friendDraw', function(msg) {
@@ -431,11 +437,21 @@ $(document).ready(function() {
 		chatGuess.toggleClass('hide');
 	});
 
+	modalOk.click(function () {
+		modal.addClass('hide');
+	});
 	document.addEventListener('keyup', function (e) {
 		if(e.keyCode == 13) {
 			//User has pressed the tab key
 			e.preventDefault();
-			chatGuess.toggleClass('hide');
+			if(chatGuess.hasClass('hide')) {
+				//Chat is hidden, show
+				chatGuess.removeClass('hide');
+				chatinput.focus();
+			} else {
+				chatGuess.addClass('hide');
+				chatinput.blur();
+			}
 		}
 	});
 
