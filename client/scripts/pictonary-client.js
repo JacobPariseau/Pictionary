@@ -97,28 +97,162 @@ $(document).ready(function() {
 	const blackInk = $('#black-ink');
 	const colorInk = $('#color-ink');
 
+	let points = [];
 	let selectedcolor = '#252525';
+	let stoppedMoving;
+
 	socket.on('draw', draw);
 
-	function draw(line) {
-		console.log(line);
+	function draw(line, clearBuffer) {
+		clearInterval(stoppedMoving);
+
+
+		if(line.stop) {
+			console.log("STOP: " + points.length);
+			stoppedMoving = setInterval(function () {
+				catchUp();
+			}, 16);
+			return;
+		}
+
+
+		if(clearBuffer) {
+			points = [line];
+		} else {
+			points.push(line);
+		}
+		const weightedPeriod = 30;
+		let point = {};
+
+		if(points.length > weightedPeriod) {
+			//There are more than weightedPeriod points in the list
+			//Calculate the destination. The source is == the last destination.
+			point = {
+				from: points[0].from,
+				to: {x: 0,y: 0}
+			};
+
+			//Sum the recent points, weighting the closest, highest.
+			for (let i = 0; i < weightedPeriod; i++) {
+					point.to.x += points[i].to.x * (weightedPeriod - i);
+					point.to.y += points[i].to.y * (weightedPeriod - i);
+			}
+
+			//Divide the sum to get the average
+			point.to.x /= (( weightedPeriod * ( weightedPeriod + 1 )) / 2 );
+			point.to.y /= (( weightedPeriod * ( weightedPeriod + 1 )) / 2 );
+
+			//Set the next source to the current destination
+			points[1].from = point.to;
+			//Remove the last point from the list so we're only smoothing recents
+			points = points.splice(1);
+			console.log(point);
+		} else {
+			//There is not enough data, start from scratch
+			point = {
+				from: {x:0, y:0},
+				to: {x: 0,y: 0}
+			};
+
+			for (let i = 0; i < points.length; i++) {
+				//If the point has a source, average it. Otherwise average the destination
+				if(points[i].from) {
+					point.from.y += points[i].from.y * (points.length - i);
+					point.from.x += points[i].from.x * (points.length - i);
+				} else {
+					point.from.y += points[i].to.y * (points.length - i);
+					point.from.x += points[i].to.x * (points.length - i);
+				}
+					point.to.x += points[i].to.x * (points.length - i);
+					point.to.y += points[i].to.y * (points.length - i);
+			}
+			console.log(point);
+			point.from.x /= (( points.length * ( points.length + 1 )) / 2 );
+			point.from.y /= (( points.length * ( points.length + 1 )) / 2 );
+			point.to.x /= (( points.length * ( points.length + 1 )) / 2 );
+			point.to.y /= (( points.length * ( points.length + 1 )) / 2 );
+		}
+
 		context.lineJoin = 'round';
 		context.lineWidth = 5;
 		context.strokeStyle = line.color;
 		context.beginPath();
 
-		if(line.from) {
-			context.moveTo(line.from.x, line.from.y);
+		//Average last ten points
+
+		if(point.from && point.from.x) {
+			context.moveTo(point.from.x, point.from.y);
 		}else{
-			context.moveTo(line.to.x-1, line.to.y);
+			context.moveTo(point.to.x-1, point.to.y);
 		}
 
-		context.lineTo(line.to.x, line.to.y);
+		context.lineTo(point.to.x, point.to.y);
 		context.closePath();
 		context.stroke();
+
+		if(myturn) {
+			point.color = line.color;
+			socket.emit('draw', point, clearBuffer);
+		}
+
+		if(points.length > 5) {
+			stoppedMoving = setInterval(function () {
+				catchUp();
+			}, 16);
+		} else {
+			console.log("No points left");
+		}
+	}
+
+	function catchUp() {
+		console.log(points.length);
+		let point;
+		if(points.length > 1) {
+			//There are more than weightedPeriod points in the list
+			//Calculate the destination. The source is == the last destination.
+			point = {
+				from: points[0].from,
+				to: {x: 0,y: 0}
+			};
+
+			//Sum the recent points, weighting the closest, highest.
+			for (let i = 0; i < points.length; i++) {
+					point.to.x += points[i].to.x * (points.length - i);
+					point.to.y += points[i].to.y * (points.length - i);
+			}
+
+			//Divide the sum to get the average
+			point.to.x /= (( points.length * ( points.length + 1 )) / 2 );
+			point.to.y /= (( points.length * ( points.length + 1 )) / 2 );
+
+			//Set the next source to the current destination
+			points[1].from = point.to;
+			//Remove the last point from the list so we're only smoothing recents
+			points = points.splice(1);
+
+			context.lineJoin = 'round';
+			context.lineWidth = 5;
+			context.strokeStyle = point.color;
+			context.beginPath();
+			if(point.from && point.from.x) {
+				context.moveTo(point.from.x, point.from.y);
+			} else {
+				context.moveTo(point.to.x-1, point.to.y);
+			}
+			context.lineTo(point.to.x, point.to.y);
+			context.closePath();
+			context.stroke();
+			if(myturn) {
+				socket.emit('draw', point);
+			}
+		} else {
+			console.log('DONE CATCHING UP')
+			clearInterval(stoppedMoving);
+		}
 	}
 
 	function drawInk(e) {
+		console.log("draw");
 		if(myturn) {
 			painting = true;
 			const x = e.pageX || e.targetTouches[0].pageX;
@@ -126,30 +260,34 @@ $(document).ready(function() {
 			var newpoint = { x: (x - gamePanel[0].offsetLeft) / this.offsetWidth * this.width, y: (y - gamePanel[0].offsetTop) / this.offsetHeight * this.height},
 				line = { from: null, to: newpoint, color: selectedcolor };
 
-			draw(line);
+
+			draw(line, true);
 			lastpoint = newpoint;
-			socket.emit('draw', line);
+
+			//socket.emit('draw', line);
 		}
 	}
 
 	function moveInk(e) {
 		if(myturn && painting) {
-			console.log(gamePanel[0]);
-			console.log(gamePanel[0].offsetLeft);
 			const x = e.pageX || e.targetTouches[0].pageX;
 			const y = e.pageY || e.targetTouches[0].pageY;
 			var newpoint = { x: (x - gamePanel[0].offsetLeft) / this.offsetWidth * this.width, y: (y - gamePanel[0].offsetTop) / this.offsetHeight * this.height},
 				line = { from: lastpoint, to: newpoint, color: selectedcolor };
 
+
 			draw(line);
 			lastpoint = newpoint;
-			socket.emit('draw', line);
+
+			//socket.emit('draw', line);
 		}
 	}
 
 	function stopInk(e) {
 		console.log('Stop');
 		painting = false;
+		line = {to: lastpoint, color: selectedcolor, stop: true};
+		socket.emit('draw', line);
 	}
 
 	// Disable text selection on the canvas
@@ -157,7 +295,6 @@ $(document).ready(function() {
 		return false;
 	});
 
-	console.log(canvas);
 	canvas[0].addEventListener('mousedown', drawInk, true);
 	canvas[0].addEventListener('touchstart', drawInk, true);
 
@@ -178,7 +315,9 @@ $(document).ready(function() {
 
 			for(var i=0; i < canvasToDraw.length; i++)
 			{
+
 				var line = canvasToDraw[i];
+				if(line.stop) continue;
 				context.strokeStyle = line.color;
 				context.beginPath();
 				if(line.from){
@@ -305,3 +444,28 @@ $(document).ready(function() {
 		readytodraw.text('DRAW');
 	}
 });
+
+function debounce(func, wait, immediate) {
+    var timeout;
+
+    return function() {
+        var context = this,   /* 1 */
+        args = arguments; /* 2 */
+
+        var later = function() {
+          timeout = null;
+
+          if ( !immediate ) {
+            func.apply(context, args);
+          }
+        };
+
+        var callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait || 200);
+
+        if (callNow) {
+          func.apply(context, args);
+        }
+    };
+}

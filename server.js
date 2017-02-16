@@ -194,13 +194,18 @@ io.sockets.on('connection', function (socket) {
 		}
 	});
 
-	socket.on('draw', function (line) {
+	socket.on('draw', function (line, clearBuffer) {
 		if(currentPlayer == socket.id) {
 			canvas.push(line);
-			socket.broadcast.emit('draw', line);
+			socket.broadcast.emit('draw', line, clearBuffer);
 		}
 	});
 
+	socket.on('catchUp', function () {
+		if(currentPlayer == socket.id) {
+			socket.broadcast.emit('catchUp');
+		}
+	})
 	socket.on('clearCanvas', function () {
 		if(currentPlayer == socket.id) {
 			canvas.splice(0, canvas.length);
