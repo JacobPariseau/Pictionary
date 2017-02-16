@@ -4,7 +4,7 @@ $(document).ready(function() {
 	}
 	const room = window.location.pathname.substring(1).toUpperCase();
 	console.log("You have entered room " + room);
-	var socket = io.connect('/');
+	var socket = io.connect('/', {query: "room="+room});
 
 	var status = $('#status'),
 		chatinput = $('#chatinput'),
@@ -182,7 +182,6 @@ $(document).ready(function() {
 
 		}
 		let velocity =  Math.cbrt(Math.pow(delta.x, 2) + Math.pow(delta.y, 2));
-		console.log(velocity);
 
 		context.lineJoin = 'round';
 		context.lineWidth =velocity + 1;
@@ -261,13 +260,11 @@ $(document).ready(function() {
 				socket.emit('draw', point);
 			}
 		} else {
-			console.log('DONE CATCHING UP')
 			clearInterval(stoppedMoving);
 		}
 	}
 
 	function drawInk(e) {
-		console.log("draw");
 		if(myturn) {
 			painting = true;
 			const x = e.pageX || e.targetTouches[0].pageX;
@@ -299,7 +296,6 @@ $(document).ready(function() {
 	}
 
 	function stopInk(e) {
-		console.log('Stop');
 		painting = false;
 		line = {to: lastpoint, color: selectedcolor, stop: true};
 		socket.emit('draw', line);
@@ -322,6 +318,7 @@ $(document).ready(function() {
 	canvas[0].addEventListener('touchcancel', stopInk, true);
 
 	socket.on('drawCanvas', function(canvasToDraw, bgcolor) {
+		console.log(canvasToDraw);
 		if(bgcolor) canvas.css('background-color',bgcolor);
 		if(canvasToDraw) {
 			//canvas.width(canvas.width());
@@ -482,28 +479,3 @@ $(document).ready(function() {
 		readytodraw.text('DRAW');
 	}
 });
-
-function debounce(func, wait, immediate) {
-    var timeout;
-
-    return function() {
-        var context = this,   /* 1 */
-        args = arguments; /* 2 */
-
-        var later = function() {
-          timeout = null;
-
-          if ( !immediate ) {
-            func.apply(context, args);
-          }
-        };
-
-        var callNow = immediate && !timeout;
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait || 200);
-
-        if (callNow) {
-          func.apply(context, args);
-        }
-    };
-}

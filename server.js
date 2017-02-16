@@ -4,8 +4,12 @@ var app = require('http').createServer(handler),
 	sanitizer = require('sanitizer'),
 	port = process.env.port || 8080;
 
+const _ = require('./lodash');
+const DB = require('./mongo');
+
 app.listen(port);
 console.log('>>> Pictionary started at port ' + port + ' >>>');
+
 
 // ================================================
 //                           server routing section
@@ -67,53 +71,74 @@ function handler (req, res) {
 //                                app logic section
 // ================================================
 
-var users = [], canvas = [];
-let background;
-var dictionary, currentWord, currentPlayer, drawingTimer;
-
+let dictionary;
+let drawingTimer;
+let saveCanvas;
 // load dictionary.txt into memory
 fs.readFile(__dirname + '/dictionary.txt', function (err, data) {
 	dictionary = data.toString('utf-8').split('\r\n');
 });
 
 io.sockets.on('connection', function (socket) {
-	var myNick = 'guest',
-		myColor = rndColor();
-		myScore = 0;
-
-	users.push({ id: socket.id, nick: myNick, color: myColor, score: myScore });
-	io.sockets.emit('userJoined', { nick: myNick, color: myColor });
-	io.sockets.emit('users', users);
-	console.log(background);
-	socket.emit('drawCanvas', canvas, background);
-
-	// notify if someone is drawing
-	if(currentPlayer) {
-		for(var i = 0; i<users.length; i++) {
-			if(users[i].id == currentPlayer) {
-				socket.emit('friendDraw', { color: users[i].color, nick: users[i].nick });
-				break;
-			}
-		}
+	// Game information
+	let game = {
+		name: socket.handshake.query.room,
+		users: [],
+		canvas: [],
+		background: "",
+		currentWord: "",
+		currentPlayer: "",
 	}
 
+	socket.join(game.name);
+
+	// User information
+	let myNick = 'guest';
+	let myColor = rndColor();
+	let myScore = 0;
+
+	const defaultUser = {
+		 id: socket.id,
+		 nick: myNick,
+		 color: myColor,
+		 score: myScore
+	};
+
+	DB.joinGame(game.name, defaultUser)
+	.then(function (result) {
+		game = result.value;
+		console.log('Joined Game');
+		io.to(game.name).emit('userJoined', { nick: myNick, color: myColor });
+		io.to(game.name).emit('users', game.users);
+		if(game.canvas) {
+			//Send the canvas to the newly connected user if one is in progress
+			socket.emit('drawCanvas', game.canvas, game.background);
+		}
+
+		// notify if someone is drawing
+		if(game.currentPlayer) {
+			_.each(game.users, function (user) {
+				if(user.id === game.currentPlayer) {
+					socket.emit('friendDraw', {
+						color: user.color,
+						nick: user.nick
+					});
+				}
+			});
+		}
+	})
+	.catch(console.log);
 	// =============
 	// chat logic section
 	// =============
 
 	function compareWords(variable, control) {
 		variable = variable.toLowerCase();
-
 		//Remove spaces from query (allows 'base ball' to match baseball)
 		variable = variable.replace(/\s/g, '');
-
 		//Reduce to length of control
 		variable = variable.substr(0, control.length);
-
-		console.log('Comparing ' + variable + ' to ' + control);
-		if(variable === control) {
-			return true;
-		} else return false;
+		return variable === control;
 	}
 
 	socket.on('message', function (msg) {
@@ -125,33 +150,38 @@ io.sockets.on('connection', function (socket) {
 			return;
 		}
 
-		io.sockets.emit('message', { text: sanitizedMsg, color: myColor, nick: myNick });
+		io.to(game.name).emit('message', { text: sanitizedMsg, color: myColor, nick: myNick });
 
-		// check if current word was guessed
-		if(currentPlayer != null && currentPlayer != socket.id) {
-			if(compareWords(sanitizedMsg, currentWord)) {
-				io.sockets.emit('wordGuessed', { text: currentWord, color: myColor, nick: myNick });
+		DB.checkGame(game.name)
+		.then(function (result) {
+			game = result;
 
-				// add scores to guesser and drawer
-				for(var i = 0; i<users.length; i++) {
-					if(users[i].id == socket.id || users[i].id == currentPlayer) {
-						users[i].score = users[i].score + 10;
-					}
+			// check if current word was guessed
+			if(game.currentPlayer != null && game.currentPlayer != socket.id) {
+				console.log("IF?");
+				if(compareWords(sanitizedMsg, game.currentWord)) {
+					io.to(game.name).emit('wordGuessed', { text: game.currentWord, color: myColor, nick: myNick });
+
+					_.each(game.users, function (user) {
+						if(user.id === socket.id || user.id === game.currentPlayer) {
+							user.score += 10; //TODO update player doc
+						}
+					});
+
+					io.to(game.name).emit('users', game.users);
+
+					// turn off drawing timer
+					clearTimeout(drawingTimer);
+					drawingTimer = null;
+
+					// allow new user to draw
+					DB.setCurrentPlayer(game.name, {});
+					game.currentPlayer = null;
+					io.to(game.name).emit('youCanDraw');
 				}
-
-				// comunicate new scores
-				sortUsersByScore();
-				io.sockets.emit('users', users);
-
-				// turn off drawing timer
-				clearTimeout(drawingTimer);
-				drawingTimer = null;
-
-				// allow new user to draw
-				currentPlayer = null;
-				io.sockets.emit('youCanDraw');
-			}
-		}
+			} else {console.log("ELSE");}
+		})
+		.catch(console.log);
 	});
 
 	socket.on('nickChange', function (user) {
@@ -163,119 +193,116 @@ io.sockets.on('connection', function (socket) {
 			return;
 		}
 
-		io.sockets.emit('nickChange', { newNick: sanitizedNick, oldNick: myNick, color: myColor });
+		io.to(game.name).emit('nickChange', { newNick: sanitizedNick, oldNick: myNick, color: myColor });
 		myNick = sanitizedNick;
 
-		for(var i = 0; i<users.length; i++) {
-			if(users[i].id == socket.id) {
-				users[i].nick = myNick;
-				break;
-			}
-		}
-
-		io.sockets.emit('users', users);
+		DB.setUserName(game.name, {
+			id: socket.id,
+			name: myNick
+		})
+		.then(function (result) {
+			game.users = result.users;
+			io.to(game.name).emit('users', game.users);
+		})
+		.catch(console.log);
 	});
 
 	socket.on('disconnect', function () {
-		io.sockets.emit('userLeft', { nick: myNick, color: myColor });
-		for(var i = 0; i<users.length; i++) {
-			if(users[i].id == socket.id) {
-				users.splice(i,1);
-				break;
+		io.to(game.name).emit('userLeft', { nick: myNick, color: myColor });
+		DB.leaveGame(game.name, {id: socket.id})
+		.then(function (result) {
+			game = result;
+
+			io.to(game.name).emit('users', game.users);
+
+			if(game.currentPlayer === socket.id) {
+				// turn off drawing timer
+				clearTimeout(drawingTimer);
+				turnFinished();
 			}
-		}
-
-		io.sockets.emit('users', users);
-
-		if(currentPlayer == socket.id) {
-			// turn off drawing timer
-			clearTimeout(drawingTimer);
-			turnFinished();
-		}
+		})
+		.catch(console.log);
 	});
 
 	socket.on('draw', function (line, clearBuffer) {
-		if(currentPlayer == socket.id) {
-			canvas.push(line);
-			socket.broadcast.emit('draw', line, clearBuffer);
+		if(game.currentPlayer == socket.id) {
+			game.canvas.push(line);
+			socket.broadcast.to(game.name).emit('draw', line, clearBuffer);
+			clearTimeout(saveCanvas);
+			saveCanvas = setTimeout(function () {
+				DB.saveCanvas(game.name, game.canvas);
+			}, 500);
 		}
 	});
 
 	socket.on('catchUp', function () {
-		if(currentPlayer == socket.id) {
-			socket.broadcast.emit('catchUp');
+		if(game.currentPlayer === socket.id) {
+			socket.broadcast.to(game.name).emit('catchUp');
 		}
 	})
 	socket.on('clearCanvas', function () {
-		if(currentPlayer == socket.id) {
-			canvas.splice(0, canvas.length);
-			io.sockets.emit('clearCanvas');
+		if(game.currentPlayer === socket.id) {
+			DB.clearCanvas(game.name);
+			game.canvas = [];
+			io.to(game.name).emit('clearCanvas');
 		}
 	});
 
 	function rndColor() {
-		const colours = [
-			'#d32f2f',
-			'#8e24aa',
-			'#1976d2',
-			'#388e3c',
-			'#f9a825',
-			'#5d4037'
-		];
-
-		return colours[Math.floor(Math.random() * colours.length)]
+		return _.sample(['#d32f2f','#8e24aa','#1976d2','#388e3c','#f9a825','#5d4037']);
 	};
 
 	function rndBackground() {
-		const colours = [
-			'#ffebee',
-			'#e8eaf6',
-			'#e3f2fd',
-			'#e0f2f1',
-			'#f1f8e9',
-			'#fff3e0'
-		];
-
-		return colours[Math.floor(Math.random() * colours.length)]
+		return _.sample(['#ffebee','#e8eaf6','#e3f2fd','#e0f2f1','#f1f8e9','#fff3e0']);
 	};
-
-	function sortUsersByScore() {
-		users.sort(function(a,b) { return parseFloat(b.score) - parseFloat(a.score) } );
-	}
 
 	// =================
 	// pictionary logic section
 	// =================
 
 	socket.on('readyToDraw', function () {
-		if (!currentPlayer) {
-			currentPlayer = socket.id;
-			canvas.splice(0, canvas.length);
-			io.sockets.emit('clearCanvas');
+		DB.checkGame(game.name)
+		.catch(console.log)
+		.then(function (result) {
+			game = result;
 
-			var randomLine = Math.floor(Math.random() * dictionary.length),
-				line = dictionary[randomLine],
-				word = line.split(',');
+			if (!game.currentPlayer) {
+				//Set Current Player
+				DB.setCurrentPlayer(game.name, {id: socket.id});
+				game.currentPlayer = socket.id;
 
-			currentWord = word[0];
-			const colour = rndColor();
-			background = rndBackground();
-			socket.emit('youDraw', word, colour, background);
-			io.sockets.emit('friendDraw', { color: myColor, nick: myNick , background: background});
+				//Clear Canvas
+				DB.clearCanvas(game.name);
+				game.canvas = [];
 
-			// set the timer for 2 minutes (120000ms)
-			drawingTimer = setTimeout( turnFinished, 120000 );
-		} else if (currentPlayer == socket.id) {
-			// turn off drawing timer
-			clearTimeout(drawingTimer);
-			turnFinished();
-		}
+				io.to(game.name).emit('clearCanvas');
+
+				const line = _.sample(dictionary);
+				const word = line.split(',');
+
+				DB.setCurrentWord(game.name, word[0]);
+				game.currentWord = word[0];
+				const colour = rndColor();
+				game.background = rndBackground();
+				socket.emit('youDraw', word, colour, game.background);
+				io.to(game.name).emit('friendDraw', { color: myColor, nick: myNick , background: game.background});
+
+				// set the timer for 2 minutes (120000ms)
+				drawingTimer = setTimeout( turnFinished, 120000 );
+			} else if (game.currentPlayer == socket.id) {
+				// turn off drawing timer
+				clearTimeout(drawingTimer);
+				turnFinished();
+			}
+		})
 	});
 
 	function turnFinished() {
+		console.log('End Turn');
 		drawingTimer = null;
-		currentPlayer = null;
-		io.sockets.emit('wordNotGuessed', { text: currentWord });
-		io.sockets.emit('youCanDraw');
+		DB.setCurrentPlayer(game.name, {})
+		game.currentPlayer = null;
+		io.to(game.name).emit('wordNotGuessed', { text: game.currentWord });
+		io.to(game.name).emit('youCanDraw');
 	}
 });
