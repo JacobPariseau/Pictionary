@@ -11,11 +11,15 @@
 
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.min.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/screenfull.js/3.0.2/screenfull.min.js"></script>
-		<script type="text/javascript" src="scripts/jquery-1.7.2.min.js"></script>
+		<script
+		  src="https://code.jquery.com/jquery-1.12.4.min.js"
+		  integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+		  crossorigin="anonymous"></script>
 		<script type="text/javascript" src="scripts/home.js"></script>
 
 	</head>
 	<body class="red">
+		<main class="home">
 
 		<header>
 			<h1>Dr. Ink</h1>
@@ -32,6 +36,26 @@
 			</form>
 		</section>
 
-		
+		<section class="red">
+			<h2>Create Game</h2>
+			<button id="play-online">PLAY ONLINE</button>
+		</section>
+	</main>
+
+		<panel class="modal hide" id="modal">
+			<div class="content">
+				<header class="toolbar">
+					<h2 id="modal-header"></h2>
+				</header>
+				<section class="dark">
+					<p id="modal-text" class="paragraph"></p>
+					<input type="text" id="create-input" />
+				</section>
+				<footer>
+					<span class="flex"></span>
+					<button id="modal-ok" class="light"></button>
+				</footer>
+			</div>
+		</panel>
 	</body>
 </html>

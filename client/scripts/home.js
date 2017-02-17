@@ -1,9 +1,30 @@
-const joinForm = $('#join-form');
-const joinInput = $('#join-input');
+$(document).ready(function() {
+  const joinForm = $('#join-form');
+  const joinInput = $('#join-input');
 
-function joinGame(e) {
-  $('#join-input').val();
+  const playOnline = $('#play-online');
+  const createInput = $('#create-input');
 
-  window.location.href = "/" + $('#join-input').val();
-  return false;
-}
+  const modal = $('#modal');
+  const modalOk = $('#modal-ok');
+  const modalHeader = $('#modal-header');
+  const modalText = $('#modal-text');
+
+
+  function joinGame(e) {
+    window.location.href = "/" + joinInput.val();
+    return false;
+  }
+
+  playOnline.click(function () {
+    modal.removeClass('hide');
+    modalHeader.text("PLAY ONLINE");
+    modalText.text("What would you like to call your room?");
+    modalOk.text('START DRAWING');
+  });
+
+  modalOk.click(function () {
+    modal.addClass('hide');
+    window.location.href = "/" + createInput.val();
+  });
+});
