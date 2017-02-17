@@ -10,12 +10,11 @@ $(document).ready(function() {
   const modalHeader = $('#modal-header');
   const modalText = $('#modal-text');
 
-
-  function joinGame(e) {
+  joinForm.submit(function (e) {
+    e.preventDefault();
     window.location.href = "/" + joinInput.val();
     return false;
-  }
-
+  });
   playOnline.click(function () {
     modal.removeClass('hide');
     modalHeader.text("PLAY ONLINE");
