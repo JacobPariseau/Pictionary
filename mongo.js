@@ -3,29 +3,23 @@
 // ================================================
 const mongo = require('mongodb');
 const fs = require('fs');
-const Client = mongo.MongoClient;
 const DB = mongo.Db;
 const BSON = mongo.BSONPure;
-const DBPATH = require('./dbpath');
 
-fs.readFile(__dirname + '/dbpath', function (err, path) {
-  const server = MongoClient.connect(path, function (err, db) {
-    
-    db.open(function(err, db) {
-    	if(!err) {
-    		console.log("Connected to Dr.Ink database");
-    		db.collection('games', {strict: true}, function (err, col) {
-          console.log('The games collection doesn\'t exist. Loading up now');
+fs.readFile(__dirname + '/dbpath', {'encoding': 'utf-8'} function (err, path) {
+  mongo.MongoClient.connect(path.trim(), function (err, db) {
 
-    			if(err) {
-          } else {
-            //Reset all sessions
-            col.remove({}, {multi: true});
-          }
+		console.log("Connected to Dr.Ink database");
+		db.collection('games', {strict: true}, function (err, col) {
+      console.log('The games collection doesn\'t exist. Loading up now');
 
-    		});
-    	}
-    });
+			if(err) {
+      } else {
+        //Reset all sessions
+        col.remove({}, {multi: true});
+      }
+
+		});
 
     exports.checkGame = checkGame;
     exports.joinGame = joinGame;
@@ -49,7 +43,7 @@ fs.readFile(__dirname + '/dbpath', function (err, path) {
           });
         });
       });
-    }
+    }mongodb://Dave:Deltaforce1@localhost:27017/doctorink
 
     function joinGame(room, user) {
       console.log("_Join Game");
