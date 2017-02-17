@@ -76,11 +76,11 @@ $(document).ready(function() {
 	});
 
 	socket.on('userJoined', function (user) {
-		chatcontent.prepend('<p>&raquo; <span style="color:' + user.color + '">' + user.nick + '</span> joined. You can change your name by replacing \'guest\' in the Message box.</p>');
+		chatcontent.prepend('<p><span style="color:' + user.color + '">' + user.nick + '</span> joined. You can change your name by replacing \'guest\' in the Message box.</p>');
 	});
 
 	socket.on('userLeft', function (user) {
-		chatcontent.prepend('<p>&raquo; <span style="color:' + user.color + '">' + user.nick + '</span> left.</p>');
+		chatcontent.prepend('<p><span style="color:' + user.color + '">' + user.nick + '</span> left.</p>');
 	});
 
 	socket.on('nickChange', function (user) {
@@ -179,12 +179,11 @@ $(document).ready(function() {
 			point.to.y /= (( points.length * ( points.length + 1 )) / 2 );
 			delta.x = Math.abs(point.to.x - points[0].to.x);
 			delta.y = Math.abs(point.to.y - points[0].to.y);
-
 		}
 		let velocity =  Math.cbrt(Math.pow(delta.x, 2) + Math.pow(delta.y, 2));
 
 		context.lineJoin = 'round';
-		context.lineWidth =velocity + 1;
+		context.lineWidth = velocity + 1;
 		context.strokeStyle = line.color;
 		context.beginPath();
 
@@ -406,7 +405,7 @@ $(document).ready(function() {
 
 		// turn on drawing timer
 		drawingTimer = setInterval( timerTick, 1000 );
-		chatcontent.prepend('<p>&raquo; <span style="color:' + msg.color + '">' + msg.nick + '</span>\'s drawing!</p>');
+		chatcontent.prepend('<p><span style="color:' + msg.color + '">' + msg.nick + '</span>\'s drawing!</p>');
 	});
 
 	socket.on('youCanDraw', function(msg) {
@@ -421,7 +420,7 @@ $(document).ready(function() {
 	});
 
 	socket.on('wordGuessed', function(msg) {
-		chatcontent.prepend('<p>&raquo; <span style="color:' + msg.color + '">' + msg.nick + '</span> guessed the word (<strong>' + msg.text + '</strong>) !!!</p>');
+		chatcontent.prepend('<p><span style="color:' + msg.color + '">' + msg.nick + '</span> guessed the word (<strong>' + msg.text + '</strong>) !!!</p>');
 		drawOptions.addClass('hide');
 		resetTimer();
 		modal.removeClass('hide');
@@ -431,7 +430,7 @@ $(document).ready(function() {
 	});
 
 	socket.on('wordNotGuessed', function(msg) {
-		chatcontent.prepend('<p>&raquo; The turn is over! The word was <strong>' + msg.text + '</strong>.</p>');
+		chatcontent.prepend('<p>The turn is over! The word was <strong>' + msg.text + '</strong>.</p>');
 		drawOptions.addClass('hide');
 		resetTimer();
 		modal.removeClass('hide');
@@ -441,12 +440,20 @@ $(document).ready(function() {
 	});
 
 	createMessage.click(function () {
-		chatGuess.toggleClass('hide');
+		if(chatGuess.hasClass('hide')) {
+			//Chat is hidden, show
+			chatGuess.removeClass('hide');
+			chatinput.focus();
+		} else {
+			chatGuess.addClass('hide');
+			chatinput.blur();
+		}
 	});
 
 	modalOk.click(function () {
 		modal.addClass('hide');
 	});
+
 	document.addEventListener('keyup', function (e) {
 		if(e.keyCode == 13) {
 			//User has pressed the tab key
@@ -455,9 +462,6 @@ $(document).ready(function() {
 				//Chat is hidden, show
 				chatGuess.removeClass('hide');
 				chatinput.focus();
-			} else {
-				chatGuess.addClass('hide');
-				chatinput.blur();
 			}
 		}
 	});

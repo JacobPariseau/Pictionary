@@ -1,3 +1,8 @@
+@font-face {
+  font-family: 'DiavloBlack';
+  src: url('../res/Diavlo_BLACK_II_37.otf') format("opentype");
+}
+
 /* ---------- */
 /* General */
 /* ---------- */
@@ -14,7 +19,7 @@ html, body {
 }
 body
 {
-	background: #fff;
+	background: #333;
 	font-family: 'Roboto', sans-serif;
 	font-size: 12px;
 	margin: 0;
@@ -39,17 +44,18 @@ p.paragraph {
 }
 
 header.toolbar {
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
-    margin: 0 auto;
-    line-height: 1.4rem;
-		position: relative;
-		display: -webkit-flex;
-	  display: -ms-flexbox;
-	  display: flex;
-	  -webkit-flex-direction: row;
-	  -ms-flex-direction: row;
-	  flex-direction: row;
-		z-index: 3;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+  margin: 0 auto;
+  line-height: 1.4rem;
+	position: relative;
+	display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+	z-index: 3;
+  font-family: 'DiavloBlack', sans-serif;
 }
 
 .toolbar h2
@@ -57,7 +63,7 @@ header.toolbar {
 	font-size: 1.3rem;
 	line-height: 4rem;
 	font-weight: normal;
-	color: black;
+	color: #fff;
 	opacity:0.8;
 	margin: 0 1rem;
 	padding: 0;
@@ -92,9 +98,6 @@ button.light {
 }
 main {
 	width: 100%;
-	max-width: 1000px;
-	margin-left:auto;
-	margin-right:auto;
 }
 
 /* -------------------------- */
@@ -102,7 +105,8 @@ main {
 /* -------------------------- */
 
 .top {
-	background: #333;
+	background: #f0f0f0;
+  padding: 1rem;
 }
 #gamepanel
 {
@@ -120,6 +124,7 @@ main {
 	cursor:crosshair;
 	width: 100%;
 	transition: background 1s;
+  box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
 }
 
 #draw-options {
@@ -151,16 +156,17 @@ span.ink {
 /* ---------------------- */
 /* third panel section */
 /* ---------------------- */
+
 .bottom {
-	box-shadow: 0 -3px 5px 0 rgba(0, 0, 0, 0.26);
-	z-index: 3;
+  max-width: 600px;
+  margin: 0 auto;
 }
 .guess {
 	width: 320px;
 	max-width: 90%;
 	margin: 0 auto;
 	position: fixed;
-	bottom: 4rem;
+	bottom: 4.5rem;
 	background: white;
 	left: 0;
 	right: 0;
@@ -172,38 +178,33 @@ span.ink {
 	z-index: 2;
 }
 
-#chatcontent
-{
-	background: #fff;
+#chatcontent {
+	background: #333;
 	overflow: auto;
 	overflow-x: hidden;
 	padding: 0.5rem 1rem;
 }
 
-#chatcontent p
-{
-	margin-top:4px;
-	margin-bottom:0;
+#chatcontent p {
+	margin: 0;
 	opacity: 0.6;
 	padding: 0.25rem;
-    border-radius: 0.25rem;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.26);
-
+  color: white;
+  font-size: 1rem;
 }
 
 #chatcontent p:first-child {
-	opacity: 1 !important;
+	opacity: 0.9 !important;
 }
-#chatnick
-{
+
+#chatnick {
 	border-radius:2px;
 	border:1px solid #ccc;
 	padding:5px;
 	width:80px;
 }
 
-#chatinput
-{
+#chatinput {
 	border-radius:2px;
 	border:1px solid #ccc;
 	padding:5px;
@@ -226,14 +227,35 @@ span.ink {
 	-ms-flex-direction: row;
 	flex-direction: row;
 }
+
+@media screen and (min-width: 600px) {
+  .action-bar {
+    height: 6rem;
+  }
+
+  .spacer {
+    transform: translateY(-1.5rem) !important;
+    -webkit-transform: translateY(-1.5rem) !important;
+    height: 4rem;
+  }
+
+  .action {
+    transform: translateY(0.5rem) !important;
+    -webkit-transform: translateY(0.5rem) !important;
+  }
+
+  .guess {
+    bottom: 7.5rem !important;
+  }
+}
 .action {
   width: 3rem;
   height: 3rem;
 	margin: 0 10%;
   border-radius: 50%;
 	opacity: 1;
-  color: white;
-  background: #252525 !important;
+  color: #333;
+  background: #fff !important;
 	display:inline-block;
 	box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
 	transform: translateY(-1rem);
@@ -241,7 +263,7 @@ span.ink {
 }
 .spacer {
 	width: 4rem;
-	background: white;
+	background: #333;
 	border-radius: 0 0 2rem 2rem;
 	margin: 0 -2rem;
 	z-index: 2;
