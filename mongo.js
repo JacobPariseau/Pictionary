@@ -6,7 +6,7 @@ const fs = require('fs');
 const DB = mongo.Db;
 const BSON = mongo.BSONPure;
 
-fs.readFile(__dirname + '/dbpath', {'encoding': 'utf-8'} function (err, path) {
+fs.readFile(__dirname + '/dbpath', {'encoding': 'utf-8'}, function (err, path) {
   mongo.MongoClient.connect(path.trim(), function (err, db) {
 
 		console.log("Connected to Dr.Ink database");
