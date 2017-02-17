@@ -3,22 +3,18 @@
 // ================================================
 const mongo = require('mongodb');
 const fs = require('fs');
-const DB = mongo.Db;
-const BSON = mongo.BSONPure;
 
+//Read db location and auth from path
 fs.readFile(__dirname + '/dbpath', {'encoding': 'utf-8'}, function (err, path) {
   mongo.MongoClient.connect(path.trim(), function (err, db) {
 
 		console.log("Connected to Dr.Ink database");
 		db.collection('games', {strict: true}, function (err, col) {
       console.log('The games collection doesn\'t exist. Loading up now');
-
-			if(err) {
-      } else {
+      if(!err) {
         //Reset all sessions
         col.remove({}, {multi: true});
       }
-
 		});
 
     exports.checkGame = checkGame;
@@ -43,7 +39,7 @@ fs.readFile(__dirname + '/dbpath', {'encoding': 'utf-8'}, function (err, path) {
           });
         });
       });
-    }mongodb://Dave:Deltaforce1@localhost:27017/doctorink
+    }
 
     function joinGame(room, user) {
       console.log("_Join Game");
