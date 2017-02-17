@@ -1,0 +1,74 @@
+@font-face {
+  font-family: 'DiavloBlack';
+  src: url('../res/Diavlo_BLACK_II_37.otf') format("opentype");
+}
+
+h1, h2, h3 {
+  font-family: 'DiavloBlack', sans-serif;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+input, button {
+  font-family: 'Roboto', sans-serif;
+  border: none;
+  padding: 0.5rem;
+  background: white;
+  font-weight: 500;
+  height: 3rem;
+  box-sizing: border-box;
+  border-radius: 0.25rem;
+  
+}
+header {
+  background: #252525;
+  padding: 1rem;
+  text-align: center;
+  color: #fafafa;
+}
+
+header h1 {
+  font-size: 20vw;
+}
+
+header h3 {
+  font-size: 5vw;
+  opacity: 0.85;
+}
+
+
+/** Join Game */
+
+
+section {
+  text-align: center;
+  color: #fff;
+  padding: 1rem;
+}
+
+section h2 {
+  font-size: 10vw;
+}
+
+section input[type="text"] {
+  max-width: 50%;
+  font-size: 1.5rem;
+}
+
+/** Create Game */
+
+section button {
+  max-width: 40%;
+  background: white;
+  padding: 0 0.5rem;
+  font-size: 1rem;
+}
+.red {
+  background: #b71c1c;
+}
+
+.violet {
+  background: #4a148c;
+}

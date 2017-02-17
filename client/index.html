@@ -4,13 +4,34 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 		<title>Dr Ink HOME</title>
-		<link rel="stylesheet" type="text/css" href="styles/pictonary.css" />
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500" />
+		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css" />
+		<link rel="stylesheet" type="text/css" href="styles/home.css" />
+
+
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.min.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/screenfull.js/3.0.2/screenfull.min.js"></script>
 		<script type="text/javascript" src="scripts/jquery-1.7.2.min.js"></script>
-		<script type="text/javascript" src="scripts/touch.js"></script>
-	</head>
-	<body>
+		<script type="text/javascript" src="scripts/home.js"></script>
 
+	</head>
+	<body class="red">
+
+		<header>
+			<h1>Dr. Ink</h1>
+			<h3>Picture-Painting and Word-Guessing</h3>
+		</header>
+
+		<section class="violet">
+			<h2>Join Game</h2>
+			<form id="join-form" name="join" onsubmit="return joinGame(event);">
+				<label for="join-game">
+					<input type="text" name="join-game" id="join-input"/>
+				</label>
+				<input type="submit" name="join-button" id="join-button" value="JOIN"/>
+			</form>
+		</section>
+
+		
 	</body>
 </html>
