@@ -12,12 +12,7 @@
 
 		<link href="https://fonts.googleapis.com/css?family=Roboto:400,500" rel="stylesheet">
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.min.js"></script>
-		<script
-		  src="https://code.jquery.com/jquery-1.12.4.min.js"
-		  integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
-		  crossorigin="anonymous"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/screenfull.js/3.0.2/screenfull.min.js"></script>
-		<script type="text/javascript" src="scripts/pictonary-client.js"></script>
 		<script type="text/javascript" src="scripts/jscolor/jscolor.js"></script>
 	</head>
 	<body>
@@ -27,7 +22,8 @@
 		<main>
 			<section class="top">
 				<div id="gamepanel">
-					<canvas id="canvas" width="300" height="300"></canvas>
+					<canvas id="draw-layer" width="300" height="300"></canvas>
+					<canvas id="overlay-layer" width="300" height="300"></canvas>
 					<footer id="draw-options" class="options">
 						<panel>
 							<span id="black-ink" class="ink black"></span>
@@ -54,6 +50,24 @@
 				</div>
 			</section>
 		</main>
+
+
+		<panel class="modal hide" id="modal">
+			<div class="content">
+				<header class="toolbar">
+					<h2 id="modal-header"></h2>
+				</header>
+				<section class="dark">
+					<p id="modal-text" class="paragraph"></p>
+				</section>
+				<footer>
+					<span class="flex"></span>
+					<button id="modal-ok" class="light"></button>
+				</footer>
+			</div>
+		</panel>
+		<!-- Post load includes -->
+		<script type="text/javascript" src="scripts/pictonary-client.js"></script>
 
 	</body>
 </html>
